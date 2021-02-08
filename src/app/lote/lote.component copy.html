@@ -1,0 +1,87 @@
+<script lang="javascript" src="dist/xlsx.full.min.js"></script>
+
+<app-breadcrumb page="início"></app-breadcrumb>
+<div class="component-container">
+  <div class="inicio-container">
+    <h2>Cadastro de Acordo em Lote</h2>
+    <p>Escolha o arquivo em formato CSV pré-definido. Após carregar, valide os campos e seus respectivos valores e clique no botão "Cadastrar."</p>
+
+    <!-- <input type="file" (change)="onFileChange($event)" multiple="false" /> -->
+
+
+    <div class="button-container">    
+      <form class="cabecalho__form" [formGroup]="formulario">
+        <voxel-form-field msgErr="Escolher o arquivo é obrigatório">
+          <input voxelInput 
+          #fileImportInput #fileImportInput name="File Upload" id="csvFileUpload"   
+          accept=".csv" 
+          formControlName="busca"
+          type="file" 
+          (change)="onFileChange($event)" 
+          multiple="false">
+        </voxel-form-field>
+
+
+      </form> 
+    </div>
+
+  <input type="file" #fileImportInput name="File Upload" id="csvFileUpload" (change)="fileChangeListener($event)"  accept=".csv" />
+
+
+    <h3>{{titulo}}</h3>
+
+    <table *ngIf="data" class="voxel-table" summary="Resultado CSV">
+      <tbody>
+      <tr *ngFor="let row of data">
+        <td *ngFor="let cell of row">
+         11 {{cell}}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <table *ngIf="csvRecords.length > 0" class="voxel-table" summary="Resultado CSV">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>22 First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Phone Number</th>
+          <th>Title</th>
+          <th>Occupation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let csvData of csvRecords;let i = index;">
+
+          <td>{{i+1}}</td>
+          <td>
+            <span>{{csvData.firstName}}</span>
+          </td>
+          <td>
+            <span>{{csvData.lastName}}</span>
+          </td>
+          <td>
+            <span>{{csvData.email}}</span>
+          </td>
+          <td>
+            <span>{{csvData.phoneNumber}}</span>
+          </td>
+          <td>
+            <span>{{csvData.title}}</span>
+          </td>
+          <td>
+            <span>{{csvData.occupation}}</span>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+
+
+  </div>
+</div>
+
+    
