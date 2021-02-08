@@ -4,12 +4,14 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ExcelsheetComponent } from './excelsheet/excelsheet.component';
+import { LoteComponent } from './lote/lote.component';
 
 @NgModule({
-  declarations: [
+  declarations: [	
     AppComponent,
-    ExcelsheetComponent
-  ],
+    ExcelsheetComponent,
+      LoteComponent
+   ],
   imports: [
     BrowserModule,
     AppRoutingModule
