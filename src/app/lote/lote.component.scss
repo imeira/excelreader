@@ -5,6 +5,45 @@
   padding-bottom: 60px;
 }
 
+.button-container {
+  // display: flex;
+  justify-content: flex-start;
+
+  button {
+    margin-top: 40px;
+  }
+}
+
+.lote-container {
+  width: 832px;
+
+  &__input {
+    min-height: 108px;
+  }
+
+  &__edit-column {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+
+  &__vxicon {
+    display: inline-block;
+  }
+}
+
+table {
+  width: 100%;
+  margin: auto;
+}
+.btn-edit {
+  text-align: right;
+}
+h2 {
+  text-align: center;
+  padding-top: 20px;
+}
+
 @media all and (min-width: 768px) {
   tr  {
     td {
