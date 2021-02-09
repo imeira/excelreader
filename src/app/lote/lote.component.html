@@ -1,14 +1,13 @@
 <script lang="javascript" src="dist/xlsx.full.min.js"></script>
 
-<app-breadcrumb page="início"></app-breadcrumb>
 <div class="component-container">
   <div class="inicio-container">
     <h2>Cadastro de Acordo em Lote</h2>
     <p>Escolha o arquivo em formato CSV pré-definido. Após carregar, valide os campos e seus respectivos valores e clique no botão "Cadastrar."</p>
 
-    <!-- <input type="file" (change)="onFileChange($event)" multiple="false" /> -->
+    <input type="file" (change)="onFileChange($event)" accept=".csv" multiple="false" /> 
 
-
+<!-- 
     <div class="button-container">    
       <form class="cabecalho__form" [formGroup]="formulario">
         <voxel-form-field msgErr="Escolher o arquivo é obrigatório">
@@ -21,9 +20,9 @@
           multiple="false">
         </voxel-form-field>
 
-
       </form> 
     </div>
+-->
 
   <input type="file" #fileImportInput name="File Upload" id="csvFileUpload" (change)="fileChangeListener($event)"  accept=".csv" />
 
