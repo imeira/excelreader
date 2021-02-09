@@ -11,65 +11,36 @@ import * as XLSX from 'xlsx';
 })
 export class LoteComponent implements OnInit {
 
-
+  // --> begin Editable table 
   editField: string;
-  personList: Array<any> = [
-    { id: 1, name: 'Aurelia Vega', age: 30, companyName: 'Deepends', country: 'Spain', city: 'Madrid' },
-    { id: 2, name: 'Guerra Cortez', age: 45, companyName: 'Insectus', country: 'USA', city: 'San Francisco' },
-    { id: 3, name: 'Guadalupe House', age: 26, companyName: 'Isotronic', country: 'Germany', city: 'Frankfurt am Main' },
-    { id: 4, name: 'Aurelia Vega', age: 30, companyName: 'Deepends', country: 'Spain', city: 'Madrid' },
-    { id: 5, name: 'Elisa Gallagher', age: 31, companyName: 'Portica', country: 'United Kingdom', city: 'London' },
-  ];
-
-  awaitingPersonList: Array<any> = [
-    { id: 6, name: 'George Vega', age: 28, companyName: 'Classical', country: 'Russia', city: 'Moscow' },
-    { id: 7, name: 'Mike Low', age: 22, companyName: 'Lou', country: 'USA', city: 'Los Angeles' },
-    { id: 8, name: 'John Derp', age: 36, companyName: 'Derping', country: 'USA', city: 'Chicago' },
-    { id: 9, name: 'Anastasia John', age: 21, companyName: 'Ajo', country: 'Brazil', city: 'Rio' },
-    { id: 10, name: 'John Maklowicz', age: 36, companyName: 'Mako', country: 'Poland', city: 'Bialystok' },
-  ];
+  awaitingCsvRecords: Array<any> = [];
 
   updateList(id: number, property: string, event: any) {
     const editField = event.target.textContent;
-    this.personList[id][property] = editField;
+    this.csvRecords[id][property] = editField;
   }
 
   remove(id: any) {
-    this.awaitingPersonList.push(this.personList[id]);
-    this.personList.splice(id, 1);
+    this.awaitingCsvRecords.push(this.csvRecords[id]);
+    this.csvRecords.splice(id, 1);
   }
 
   add() {
-    if (this.awaitingPersonList.length > 0) {
-      const person = this.awaitingPersonList[0];
-      this.personList.push(person);
-      this.awaitingPersonList.splice(0, 1);
+    if (this.awaitingCsvRecords.length > 0) {
+      const person = this.awaitingCsvRecords[0];
+      this.csvRecords.push(person);
+      this.awaitingCsvRecords.splice(0, 1);
     }
   }
 
   changeValue(id: number, property: string, event: any) {
     this.editField = event.target.textContent;
   }
+// --> end Editable table 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// --> begin xlsx
   formulario: FormGroup;
 
   data: [][];
@@ -87,7 +58,6 @@ export class LoteComponent implements OnInit {
     this.formulario = this.formBuilder.group({
       busca: [null, Validators.required],
     });
-    // this.service.createTableWithIds(this.tableHeaders, this.tableRowsWithId, this.dataType);
   }
 
   onFileChange(evt: any) {
@@ -106,7 +76,7 @@ export class LoteComponent implements OnInit {
 
       const wsname : string = wb.SheetNames[0];
 
-      this.titulo = evt.target.files[0].name;
+      this.titulo = "1- " + evt.target.files[0].name;
       //console.log(this.titulo);
 
       const ws: XLSX.WorkSheet = wb.Sheets[wsname];
@@ -131,11 +101,10 @@ export class LoteComponent implements OnInit {
     reader.readAsBinaryString(target.files[0]);
 
   }
+// --> end xlsx
 
-
-//usando ngx-csv-parser
-
-  csvRecords: any[] = [];
+// --> begin ngx-csv-parser
+  csvRecords: Array<any> = [];
   header: boolean = true;
 
 
@@ -148,18 +117,18 @@ export class LoteComponent implements OnInit {
     // Select the files from the event
     const files = $event.srcElement.files;
 
-    this.titulo = files[0].name;
+    this.titulo = "2- " + files[0].name;
  
     // Parse the file you want to select for the operation along with the configuration
     this.ngxCsvParser.parse(files[0], { header: this.header, delimiter: ';' })
-    .pipe().subscribe((result: any) => {
+    .pipe().subscribe((result: Array<any>) => {
       console.log('XXX 2 XXX Result', result);
       this.csvRecords = result;
     }, (error: NgxCSVParserError) => {
       console.log('XXX 2 XXX Error', error);
     });
   }
-
+// --> end ngx-csv-parser
 
 
 }
