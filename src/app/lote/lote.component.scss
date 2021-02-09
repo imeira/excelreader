@@ -4,3 +4,16 @@
   min-height: calc(100vh - 180px);
   padding-bottom: 60px;
 }
+
+@media all and (min-width: 768px) {
+  tr  {
+    td {
+      vertical-align: middle !important;
+    }
+    span {
+      &:not([class]) {
+        padding: 1rem 1rem;
+      }
+    }
+  }
+}

@@ -5,8 +5,6 @@
     <h2>Cadastro de Acordo em Lote</h2>
     <p>Escolha o arquivo em formato CSV pré-definido. Após carregar, valide os campos e seus respectivos valores e clique no botão "Cadastrar."</p>
 
-    <input type="file" (change)="onFileChange($event)" accept=".csv" multiple="false" /> 
-
 <!-- 
     <div class="button-container">    
       <form class="cabecalho__form" [formGroup]="formulario">
@@ -24,59 +22,89 @@
     </div>
 -->
 
-  <input type="file" #fileImportInput name="File Upload" id="csvFileUpload" (change)="fileChangeListener($event)"  accept=".csv" />
+    <input type="file" (change)="onFileChange($event)" accept=".csv" multiple="false" /> 
 
+    <input type="file" #fileImportInput name="File Upload" id="csvFileUpload" (change)="fileChangeListener($event)"  accept=".csv" />
 
-    <h3>{{titulo}}</h3>
-
-    <table *ngIf="data" class="voxel-table" summary="Resultado CSV">
+  <div class="card" *ngIf="data && csvRecords.length == 0" >
+    <h3>1- {{titulo}}</h3>
+    <table  class="voxel-table" summary="Resultado CSV">
       <tbody>
-      <tr *ngFor="let row of data">
-        <td *ngFor="let cell of row">
-         11 {{cell}}
-        </td>
-      </tr>
+        <tr *ngFor="let row of data">
+          <td *ngFor="let cell of row">
+            1- {{cell}}
+          </td>
+        </tr>
       </tbody>
     </table>
+  </div>
+    
 
-    <table *ngIf="csvRecords.length > 0" class="voxel-table" summary="Resultado CSV">
-      <thead>
+<!-- Editable table -->
+<div class="card" *ngIf="csvRecords.length > 0">
+   <h3 class="card-header text-center font-weight-bold text-uppercase py-4">{{titulo}}</h3>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <span class="table-add float-right mb-3 mr-2">
+        <a class="text-success" (click)="add()">
+          <mdb-icon fas icon="plus" size="2x"></mdb-icon>
+        </a>
+      </span>
+      <table summary="Resultado CSV" class="table table-bordered table-responsive-md table-striped text-center">
         <tr>
-          <th>#</th>
-          <th>22 First Name</th>
-          <th>Last Name</th>
-          <th>Email</th>
-          <th>Phone Number</th>
-          <th>Title</th>
-          <th>Occupation</th>
         </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let csvData of csvRecords;let i = index;">
-
-          <td>{{i+1}}</td>
-          <td>
-            <span>{{csvData.firstName}}</span>
-          </td>
-          <td>
-            <span>{{csvData.lastName}}</span>
-          </td>
-          <td>
-            <span>{{csvData.email}}</span>
-          </td>
-          <td>
-            <span>{{csvData.phoneNumber}}</span>
-          </td>
-          <td>
-            <span>{{csvData.title}}</span>
-          </td>
-          <td>
-            <span>{{csvData.occupation}}</span>
-          </td>
-
+        <tr>
+          <th class="text-center">2- First Name</th>
+          <th class="text-center">Last Name</th>
+          <th class="text-center">Email</th>
+          <th class="text-center">Phone Number</th>
+          <th class="text-center">Title</th>
+          <th class="text-center">Occupation</th>
+          <th class="text-center">Sort</th>
+          <th class="text-center">Remove</th>
         </tr>
-      </tbody>
-    </table>
+        <tr *ngFor="let csvData of csvRecords; let id = index">
+          <td>
+            <span (keyup)="changeValue(id, 'firstName', $event)" (blur)="updateList(id, 'firstName', $event)" contenteditable="true">{{csvData.firstName}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'lastName', $event)" (blur)="updateList(id, 'lastName', $event)">{{csvData.lastName}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'email', $event)" (blur)="updateList(id, 'email', $event)">{{csvData.email}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'phoneNumber', $event)" (blur)="updateList(id, 'phoneNumber', $event)">{{csvData.phoneNumber}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'title', $event)" (blur)="updateList(id, 'title', $event)">{{csvData.title}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'occupation', $event)" (blur)="updateList(id, 'occupation', $event)">{{csvData.occupation}}</span>
+          </td>
+          <td>
+            <span class="table-up">
+              <a class="indigo-text">
+                <mdb-icon fas icon="long-arrow-alt-up"></mdb-icon>
+              </a>
+            </span>
+            <span class="table-down">
+              <a class="indigo-text">
+                <mdb-icon fas icon="long-arrow-alt-down"></mdb-icon>
+              </a>
+            </span>
+          </td>
+          <td>
+            <span class="table-remove">
+              <button type="button" mdbBtn color="danger" rounded="true" size="sm" class="my-0" (click)="remove(id)">Remove</button>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- Editable table -->
 
 
 
@@ -84,3 +112,6 @@
 </div>
 
     
+
+
+

@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { ExcelsheetComponent } from './excelsheet/excelsheet.component';
 import { LoteComponent } from './lote/lote.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MDBBootstrapModule } from 'angular-bootstrap-md';
 
 @NgModule({
   declarations: [	
@@ -17,6 +18,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     FormsModule, 
+    MDBBootstrapModule.forRoot(),
     ReactiveFormsModule
   ],
   providers: [],
