@@ -11,8 +11,10 @@
 
 <br><br>
 
+
+
 <!-- Material table -->
-<div class="card" *ngIf="dataSource.length > 0">
+<div class="card" *ngIf="dataSource.data && dataSource.data.length > 0">
   <h3 class="card-header text-center font-weight-bold text-uppercase py-4">{{titulo}}</h3>
  <div class="card-body">
    <div id="table" class="table-editable">
@@ -21,9 +23,9 @@
          <mdb-icon fas icon="plus" size="2x"></mdb-icon>
        </a>
      </span>
-      <table mat-table [dataSource]="dataSource">
+      <table class="voxel-table mat-elevation-z8" mat-table matSort [dataSource]="dataSource">
         <ng-container matColumnDef="{{col}}" *ngFor="let col of displayedColumns">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
             <span *ngIf="col !== '$$edit'">
               {{col}}
             </span>
@@ -35,7 +37,7 @@
             <div *ngIf="!element.isEdit">
               <div class="btn-edit" *ngIf="col === '$$edit'; spanHeader" >
                 <button (click)="element.isEdit = !element.isEdit">Editar</button>
-                <span class="table-remove">
+                <span class="btn-remove">
                   <button (click)="remove(i)" color="danger">Remover</button>
                 </span>
               </div>
@@ -45,7 +47,8 @@
             </div>
             <div *ngIf="element.isEdit">
               <div class="btn-edit" *ngIf="col === '$$edit'; else dateField">
-                <button (click)="element.isEdit = !element.isEdit">Confirmar</button>
+                <button (click)="confirmEdit($event); element.isEdit = !element.isEdit">Confirmar</button>
+                <!-- <button (click)="cancelEdit(); element.isEdit = !element.isEdit">Cancelar</button> -->
               </div>
               <ng-template #dateField>
                 <mat-form-field appearance="fill" #elseDate *ngIf="dataSchema[col] === 'date'; else defaultField">
@@ -58,7 +61,8 @@
               <ng-template #defaultField>
                 <mat-form-field>
                   <mat-label>{{col}}</mat-label>
-                  <input type="{{dataSchema[col]}}" matInput value="{{element[col]}}" (blur)="updateList(i, col, $event)">
+                  <!-- <input type="{{dataSchema[col]}}" matInput value="{{element[col]}}" (blur)="updateList(i, col, $event)"> -->
+                   <input (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" type="{{dataSchema[col]}}" matInput value="{{element[col]}}">
                 </mat-form-field>
               </ng-template>
             </div>
