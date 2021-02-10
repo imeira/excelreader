@@ -34,25 +34,9 @@
 
 table {
   width: 100%;
-  margin: auto;
-}
-.btn-edit {
-  text-align: right;
-}
-h2 {
-  text-align: center;
-  padding-top: 20px;
+  background-color:white;
 }
 
-@media all and (min-width: 768px) {
-  tr  {
-    td {
-      vertical-align: middle !important;
-    }
-    span {
-      &:not([class]) {
-        padding: 1rem 1rem;
-      }
-    }
-  }
+th.mat-sort-header-sorted {
+  color: black;
 }
