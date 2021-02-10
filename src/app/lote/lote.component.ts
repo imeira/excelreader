@@ -1,7 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { NgxCsvParser, NgxCSVParserError } from 'ngx-csv-parser';
 import * as XLSX from 'xlsx';
+
+import { Acordo } from '../model/Acordo';
+
 
 const SCHEMA = {
   'NOME_POUPADOR': 'text',
@@ -12,47 +17,7 @@ const SCHEMA = {
   'COMPLEMENTO': 'text',
   'MUNICIPIO': 'text',
   'BAIRRO': 'text',
-  'UF': 'text'/*,
-  'CEP': 'text',
-  'NR_PROCESSO': 'text',
-  'CDPASTA': 'text',
-  'UF_PROCESSO': 'text',
-  'ORGAO': 'text',
-  'VARA': 'text',
-  'COMARCA': 'text',
-  'DT_AJUIZAMENTO': 'text',
-  'TIPO_ACAO': 'text',
-  'ADV	NOME_ADVOGADO': 'text',
-  'CPF_ADVOGADO': 'text',
-  'OAB	OAB_UF	CNPJ': 'text',
-  'RAZAO_SOCIAL': 'text',
-  'OPTANTE_SIMPLES': 'text',
-  'VL_BRUTO_ACORDO': 'text',
-  'VL_ACORDO_PAGO': 'text',
-  'VL_HONORARIO': 'text',
-  'VL_FEBRAPO': 'text',
-  'VL_CUSTAS': 'text',
-  'FORMA_ACORDO': 'text',
-  'FORMA_HONORARIO': 'text',
-  'QTD_PARC_ACORDO': 'text',
-  'VL_PARC_ACORDO': 'text',
-  'DEST_ACORDO': 'text',
-  'DEST_HONORARIO': 'text',
-  'NR_BANCO_POUPADOR': 'text',
-  'DS_BANCO_POUPADOR': 'text',
-  'NR_AGENCIA_POUPADOR': 'text',
-  'NR_CONTA_POUPADOR': 'text',
-  'DV_CONTA_POUPADOR': 'text',
-  'DS_BANCO_ADVOGADO': 'text',
-  'NR_BANCO_ADVOGADO': 'text',
-  'NR_AGENCIA_ADVOGADO': 'text',
-  'NR_CONTA_ADVOGADO': 'text',
-  'DV_CONTA_ADVOGADO': 'text',
-  'TIPO_PROCESSAMENTO': 'text',
-  'ID_PORTAL_ORIGEM': 'text',
-  'ID_PARCELA_ACORDO_ORIGEM': 'text',
-  'ID_PARCELA_HONO_ORIGEM': 'text',
-  'ID_PARCELA_FEBR_ORIGEM': 'text' */
+  'UF': 'text'
 };
 
 const COLUMNS = [
@@ -65,48 +30,16 @@ const COLUMNS = [
   'MUNICIPIO',
   'BAIRRO',
   'UF',
-  /*'CEP',
-  'NR_PROCESSO',
-  'CDPASTA',
-  'UF_PROCESSO',
-  'ORGAO',
-  'VARA',
-  'COMARCA',
-  'DT_AJUIZAMENTO',
-  'TIPO_ACAO',
-  'ADV',
-  'CPF_ADVOGADO',
-  'OAB',
-  'RAZAO_SOCIAL',
-  'OPTANTE_SIMPLES',
-  'VL_BRUTO_ACORDO',
-  'VL_ACORDO_PAGO',
-  'VL_HONORARIO',
-  'VL_FEBRAPO',
-  'VL_CUSTAS',
-  'FORMA_ACORDO',
-  'FORMA_HONORARIO',
-  'QTD_PARC_ACORDO',
-  'VL_PARC_ACORDO',
-  'DEST_ACORDO',
-  'DEST_HONORARIO',
-  'NR_BANCO_POUPADOR',
-  'DS_BANCO_POUPADOR',
-  'NR_AGENCIA_POUPADOR',
-  'NR_CONTA_POUPADOR',
-  'DV_CONTA_POUPADOR',
-  'DS_BANCO_ADVOGADO',
-  'NR_BANCO_ADVOGADO',
-  'NR_AGENCIA_ADVOGADO',
-  'NR_CONTA_ADVOGADO',
-  'DV_CONTA_ADVOGADO',
-  'TIPO_PROCESSAMENTO',
-  'ID_PORTAL_ORIGEM',
-  'ID_PARCELA_ACORDO_ORIGEM',
-  'ID_PARCELA_HONO_ORIGEM',
-  'ID_PARCELA_FEBR_ORIGEM', */
   '$$edit'
 ];
+
+
+
+const ELEMENT_DATA: Acordo[] = [];
+
+
+type AOA = any[][];
+
 
 @Component({
   selector: 'app-lote',
@@ -125,9 +58,17 @@ export class LoteComponent implements OnInit {
 
   displayedColumns: string[] = COLUMNS;
   dataSchema = SCHEMA;
+  dataSource = new MatTableDataSource(ELEMENT_DATA);
 
-  // dataSource = [];
-  dataSource: Array<any> = [];
+  @ViewChild(MatSort) sort: MatSort;
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
+
+
+  data!: AOA;
+  
 
   // --> begin Editable table
   editField: string;
@@ -138,38 +79,74 @@ export class LoteComponent implements OnInit {
      });
    }
 
-  updateList(id: number, property: string, event: any) {
-    console.log('XXX 2 XXX updateList id', id);
-    console.log('XXX 2 XXX updateList property', property);
-    // const editField = event.target.textContent;
-    const editField = event.target.value;
-    console.log('XXX 2 XXX updateList editField', editField);
-    console.log('XXX 2 XXX updateList this.dataSource', this.dataSource);
-    console.log('XXX 2 XXX updateList event', event);
-    this.dataSource[id][property] = editField;
-    console.log('XXX 2 XXX updateList new this.dataSource', this.dataSource);
+   applyFilter(filterValue: string) {
+    filterValue = filterValue.trim(); // Remove whitespace
+    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.filter = filterValue;
+  }
+  
+  confirmEdit(event: any){
+    console.log('XXXXXX confirmEdit event', event);
+    this.dataSource._updateChangeSubscription();
   }
 
+  cancelEdit(){
+    console.log('XXXXXX cancelEdit');
+    this.dataSource._updateChangeSubscription();
+  }
+  
+  updateList(id: number, property: string, event: any) {
+    console.log('XXXXXX updateList id', id);
+    console.log('XXXXXX updateList property', property);
+    // const editField = event.target.textContent;
+    const editField = event.target.value;
+    console.log('XXXXXX updateList editField', editField);
+    console.log('XXXXXX updateList this.dataSource', this.dataSource);
+    console.log('XXXXXX updateList event', event);
+    this.dataSource.data = this.dataSource.data.map((e, i) => {
+      if (id === i) {
+        return {
+          ...e,
+          [property]: editField
+        };
+      }
+      return e;
+    });
+    const data = this.dataSource.data;
+    console.log('XXXXXX updateList data', data);
+    this.dataSource._updateChangeSubscription();
+
+    console.log('XXXXXX updateList new this.dataSource', this.dataSource);
+  }
+
+
+  
   remove(id: any) {
-    console.log('XXX 2 XXX remove id', id);
-    this.dataSource.splice(id, 1);
-    console.log('XXX 2 XXX remove dataSource', this.dataSource);
+    console.log('XXXXXX remove id', id);
+    this.dataSource.data.splice(id, 1);
+    console.log('XXXXXX remove dataSource', this.dataSource);
+    this.dataSource.sort;
+    this.dataSource._updateChangeSubscription();
   }
 
   add() {
-      const data: Array<any> = [];
-      this.dataSource.push(data);
-      console.log('XXX 2 XXX add this.dataSource', this.dataSource);
+      this.dataSource.data.push(<never>[]);
+      console.log('XXXXXX add this.dataSource', this.dataSource);
+      this.dataSource._updateChangeSubscription();
   }
+
+  
 
   changeValue(id: number, property: string, event: any) {
-    console.log('XXX 2 XXX changeValue id', id);
-    console.log('XXX 2 XXX changeValue property', property);
+    console.log('XXXXXX changeValue id', id);
+    console.log('XXXXXX changeValue property', property);
     this.editField = event.target.textContent;
-    console.log('XXX 2 XXX changeValue editField', this.editField);
+    console.log('XXXXXX changeValue editField', this.editField);
   }
+
 // --> end Editable table
 
+file!:File;
 
 // --> begin xlsx
 onFileChange(evt: any) {
@@ -178,6 +155,14 @@ onFileChange(evt: any) {
   if (target.files.length !== 1) { throw new Error('Cannot use multiple files'); }
 
   const reader: FileReader = new FileReader();
+
+  this.file= target.files[0];
+
+  // reader.readAsText(this.file);
+      // reader.onload = (e) => {
+      //   let csv: string = reader.result as string;
+      //   console.log(csv);
+      // }
 
   reader.onload = (e: any) => {
     const bstr: string = e.target.result;
@@ -189,21 +174,24 @@ onFileChange(evt: any) {
     this.titulo = evt.target.files[0].name;
 
     const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-    console.log('XXX 1 XXX ws', ws);
+    console.log('XXXXXX ws', ws);
 
-    this.dataSource = (XLSX.utils.sheet_to_json(ws, { header: 1 }));
-    console.log('XXX 1 XXX dataSource', this.dataSource);
+     /* save data */
+     this.data = <AOA>(XLSX.utils.sheet_to_json(ws, {header: 1}));
+    console.log('XXXXXX data', this.data);
+    console.log('XXXXXX dataSource', this.dataSource);
+
 
     /* Validação colunas*/
-    console.log('XXX 1 XXX header_diff', this.header_diff(this.displayedColumns, this.dataSource[0]));
+    console.log('XXXXXX header_diff', this.header_diff(this.displayedColumns, this.dataSource.data));
 
-    this.displayedColumns = this.dataSource[0];
+    this.displayedColumns = this.data[0];
     this.displayedColumns.push('$$edit');
 
-    console.log('XXX 1 XXX displayedColumns', this.displayedColumns);
+    console.log('XXXXXX displayedColumns', this.displayedColumns);
 
-    const rows = this.dataSource.slice(1);
-    console.log('XXX 1 XXX dataSource.slice(1)', rows);
+    const rows = this.dataSource.data.slice(1);
+    console.log('XXXXXX dataSource.slice(1)', rows);
 
   };
 
@@ -211,25 +199,26 @@ onFileChange(evt: any) {
 
   // Select the files from the event
   const files = evt.srcElement.files;
-  console.log('XXX 2 XXX files', files);
+  console.log('XXXXXX files', files);
 
   // Parse the file you want to select for the operation along with the configuration
   this.ngxCsvParser.parse(files[0], { header: true, delimiter: ';' })
   .pipe().subscribe((result: any) => {
-    console.log('XXX 2 XXX Result', result);
-    this.dataSource = result;
+    console.log('XXXXXX Result', result);
+    this.dataSource.data = result;
   }, (error: NgxCSVParserError) => {
-    console.log('XXX 2 XXX Error', error);
+    console.log('XXXXXX Error', error);
   });
 
 
 }
 
-header_diff(a1: any[], a2: any[]) {
+header_diff(a1: any[], a2: Acordo[]) {
 
   const intersectionA = a1.filter(x => a2.includes(x));
   const diferenceA = a1.filter(x => !intersectionA.includes(x));
-
+  console.log('XXXXXX header_diff', diferenceA);
+  
   return diferenceA;
 
 
