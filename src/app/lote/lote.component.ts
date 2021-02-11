@@ -2,9 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NgxCsvParser, NgxCSVParserError } from 'ngx-csv-parser';
+import { NgxCSVParserError } from 'ngx-csv-parser';
 import * as XLSX from 'xlsx';
-import {  WorkBook, read, utils, write, readFile } from 'xlsx';
+import { read, utils } from 'xlsx';
 import { Acordo } from '../model/Acordo';
 
 
@@ -29,8 +29,8 @@ const COLUMNS = [
   'COMPLEMENTO',
   'MUNICIPIO',
   'BAIRRO',
-  'UF',
-  '$$edit'
+  'UF'
+  // ,'$$edit'
 ];
 
 const ELEMENT_DATA: Acordo[] = [];
@@ -44,8 +44,8 @@ type AOA = any[][];
 export class LoteComponent implements OnInit {
 
   constructor(
-    private formBuilder: FormBuilder,
-    private ngxCsvParser: NgxCsvParser
+    private formBuilder: FormBuilder
+    // ,private ngxCsvParser: NgxCsvParser
    ) { }
 
   formulario: FormGroup;
@@ -68,11 +68,11 @@ export class LoteComponent implements OnInit {
   //   this.dataSource.sort = this.sort;
   // }
 
-   ngOnInit() {
-     this.formulario = this.formBuilder.group({
-       busca: [null, Validators.required],
-     });
-   }
+  ngOnInit() {
+    this.formulario = this.formBuilder.group({
+      busca: [null, Validators.required],
+    });
+  }
 
   //  applyFilter(filterValue: string) {
   //   filterValue = filterValue.trim(); // Remove whitespace
@@ -80,12 +80,12 @@ export class LoteComponent implements OnInit {
   //   this.dataSource.filter = filterValue;
   // }
 
-  confirmEdit(event: any){
+  confirmEdit(event: any) {
     console.log('XXXXXX confirmEdit event', event);
     this.dataSource._updateChangeSubscription();
   }
 
-  cancelEdit(){
+  cancelEdit() {
     console.log('XXXXXX cancelEdit');
     this.dataSource._updateChangeSubscription();
   }
@@ -124,9 +124,9 @@ export class LoteComponent implements OnInit {
   }
 
   add() {
-      this.dataSource.data.push([] as never);
-      console.log('XXXXXX add this.dataSource', this.dataSource);
-      this.dataSource._updateChangeSubscription();
+    this.dataSource.data.push([] as never);
+    console.log('XXXXXX add this.dataSource', this.dataSource);
+    this.dataSource._updateChangeSubscription();
   }
 
   changeValue(id: number, property: string, event: any) {
@@ -137,7 +137,7 @@ export class LoteComponent implements OnInit {
   }
 
   onFileChange(evt: any) {
-    const target: DataTransfer =  (evt.target) as DataTransfer;
+    const target: DataTransfer = (evt.target) as DataTransfer;
 
     if (target.files.length !== 1) { throw new Error('Cannot use multiple files'); }
 
@@ -149,25 +149,24 @@ export class LoteComponent implements OnInit {
     let xLRowObject;
     // let parsedJSON = [];
     let jsonObject;
-    reader.onload = (e: any) => {
+    reader.onload = () => {
       //  alert(reader.result);
       const data = reader.result;
-      workbookkk = read(data, {type: 'binary'});
+      workbookkk = read(data, { type: 'binary' });
       console.log('XXXXXX convertExcelToJson workbookkk', workbookkk);
 
       const ws: XLSX.WorkSheet = workbookkk.Sheets[workbookkk.SheetNames[0]];
       console.log('XXXXXX ws', ws);
 
       /* save data */
-      this.data = ((XLSX.utils.sheet_to_json(ws, {header: 1})) as AOA);
+      this.data = ((XLSX.utils.sheet_to_json(ws, { header: 1 })) as AOA);
       console.log('XXXXXX data', this.data);
 
-      /* Validação colunas*/
-      console.log('XXXXXX header_diff', this.header_diff(this.displayedColumns, this.dataSource.data));
-
       this.displayedColumns = this.data[0];
-      this.displayedColumns.push('$$edit');
       console.log('XXXXXX displayedColumns', this.displayedColumns);
+      this.validateColuns();
+
+      this.displayedColumns.push('$$edit');
 
       xLRowObject = utils.sheet_to_json(workbookkk.Sheets[workbookkk.SheetNames[0]]);
       jsonObject = JSON.stringify(xLRowObject);
@@ -177,8 +176,10 @@ export class LoteComponent implements OnInit {
       console.log('XXXXXX convertExcelToJson xLRowObject', xLRowObject);
       // parsedJSON = JSON.parse(jsonObject);
       // console.log('XXXXXX convertExcelToJson parsedJSON', parsedJSON);
+      // @ts-ignore
       this.dataSource.data = xLRowObject;
       console.log('XXXXXX this.dataSource.data ', this.dataSource.data);
+
       this.setDownload(jsonObject);
     };
 
@@ -187,21 +188,34 @@ export class LoteComponent implements OnInit {
   // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat('...');
   }
 
-  setDownload(data) {
-    this.willDownload = true;
-    setTimeout(() => {
-      const el = document.querySelector('#download');
-      el.setAttribute('href', `data:text/json;charset=utf-8,${encodeURIComponent(data)}`);
-      el.setAttribute('download', 'modelo.csv');
-    }, 1000);
-  }
 
-
-  header_diff(a1: any[], a2: Acordo[]) {
+  header_diff(a1: any[], a2: any[]): any {
     const intersectionA = a1.filter(x => a2.includes(x));
     const diferenceA = a1.filter(x => !intersectionA.includes(x));
     console.log('XXXXXX header_diff', diferenceA);
     return diferenceA;
+  }
+
+  private validateColuns() {
+    const headerDiff = this.header_diff(COLUMNS, this.displayedColumns);
+    console.log('XXXXXX header_diff', headerDiff);
+    console.log('XXXXXX this.header_diff.length', headerDiff.length);
+    if (headerDiff.length > 0) {
+      console.log('XXXXXX NgxCSVParserError Formato de arquivo invalido ');
+      this.dataSource.data = [];
+      throw new NgxCSVParserError();
+    }
+  }
+
+  setDownload(data: any) {
+    this.willDownload = true;
+    setTimeout(() => {
+      const el = document.querySelector('#download');
+      if (el != null) {
+        el.setAttribute('href', `data:text/json;charset=utf-8,${encodeURIComponent(data)}`);
+        el.setAttribute('download', 'modelo.csv');
+      }
+    }, 1000);
   }
 
 }
