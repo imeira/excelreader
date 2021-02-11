@@ -46,7 +46,7 @@ export class LoteComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder
     // ,private ngxCsvParser: NgxCsvParser
-   ) { }
+  ) { }
 
   formulario: FormGroup;
   titulo: string;
@@ -185,7 +185,7 @@ export class LoteComponent implements OnInit {
 
     reader.readAsBinaryString(target.files[0]);
 
-  // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat('...');
+    // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat('...');
   }
 
 
