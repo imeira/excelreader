@@ -5,19 +5,21 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NgxCsvParser, NgxCSVParserError } from 'ngx-csv-parser';
 import * as XLSX from 'xlsx';
 
+import {  WorkBook, read, utils, write, readFile } from 'xlsx';
+
 import { Acordo } from '../model/Acordo';
 
 
 const SCHEMA = {
-  'NOME_POUPADOR': 'text',
-  'CPF_POUPADOR': 'text',
-  'DT_NASC_POUPADOR': 'text',
-  'ENDERECO': 'text',
-  'NUMERO': 'text',
-  'COMPLEMENTO': 'text',
-  'MUNICIPIO': 'text',
-  'BAIRRO': 'text',
-  'UF': 'text'
+  NOME_POUPADOR: 'text',
+  CPF_POUPADOR: 'text',
+  DT_NASC_POUPADOR: 'text',
+  ENDERECO: 'text',
+  NUMERO: 'text',
+  COMPLEMENTO: 'text',
+  MUNICIPIO: 'text',
+  BAIRRO: 'text',
+  UF: 'text'
 };
 
 const COLUMNS = [
@@ -62,16 +64,21 @@ export class LoteComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort;
 
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
-  }
-
 
   data!: AOA;
-  
+
+  willDownload = false;
 
   // --> begin Editable table
   editField: string;
+
+// --> end Editable table
+
+  file!: File;
+
+  // ngAfterViewInit() {
+  //   this.dataSource.sort = this.sort;
+  // }
 
    ngOnInit() {
      this.formulario = this.formBuilder.group({
@@ -84,7 +91,7 @@ export class LoteComponent implements OnInit {
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
-  
+
   confirmEdit(event: any){
     console.log('XXXXXX confirmEdit event', event);
     this.dataSource._updateChangeSubscription();
@@ -94,7 +101,7 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX cancelEdit');
     this.dataSource._updateChangeSubscription();
   }
-  
+
   updateList(id: number, property: string, event: any) {
     console.log('XXXXXX updateList id', id);
     console.log('XXXXXX updateList property', property);
@@ -120,22 +127,23 @@ export class LoteComponent implements OnInit {
   }
 
 
-  
+
   remove(id: any) {
     console.log('XXXXXX remove id', id);
     this.dataSource.data.splice(id, 1);
     console.log('XXXXXX remove dataSource', this.dataSource);
+    // tslint:disable-next-line:no-unused-expression
     this.dataSource.sort;
     this.dataSource._updateChangeSubscription();
   }
 
   add() {
-      this.dataSource.data.push(<never>[]);
+      this.dataSource.data.push([] as never);
       console.log('XXXXXX add this.dataSource', this.dataSource);
       this.dataSource._updateChangeSubscription();
   }
 
-  
+
 
   changeValue(id: number, property: string, event: any) {
     console.log('XXXXXX changeValue id', id);
@@ -144,25 +152,146 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX changeValue editField', this.editField);
   }
 
-// --> end Editable table
-
-file!:File;
-
 // --> begin xlsx
-onFileChange(evt: any) {
+
+  onFileChange(evt: any) {
+    const target: DataTransfer =  (evt.target) as DataTransfer;
+
+    if (target.files.length !== 1) { throw new Error('Cannot use multiple files'); }
+
+    const reader: FileReader = new FileReader();
+
+    this.file = target.files[0];
+
+    let workbookkk;
+    let xLRowObject;
+    let parsedJSON = [];
+    let jsonObject;
+    reader.onload = (e: any) => {
+      //  alert(reader.result);
+      const data = reader.result;
+      workbookkk = read(data, {type: 'binary'});
+      console.log('XXXXXX convertExcelToJson workbookkk', workbookkk);
+      // Here is your object
+      xLRowObject = utils.sheet_to_json(workbookkk.Sheets[workbookkk.SheetNames[0]]);
+      jsonObject = JSON.stringify(xLRowObject);
+      console.log(jsonObject);
+      console.log('XXXXXX convertExcelToJson jsonObject', jsonObject);
+      console.log(xLRowObject);
+      console.log('XXXXXX convertExcelToJson xLRowObject', xLRowObject);
+      parsedJSON = JSON.parse(jsonObject);
+      console.log('XXXXXX convertExcelToJson parsedJSON', parsedJSON);
+      this.dataSource.data = xLRowObject;
+      console.log('XXXXXX this.dataSource.data ', this.dataSource.data);
+    };
+    reader.readAsBinaryString(target.files[0]);
+
+      // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat('...');
+      // this.setDownload(dataString);
+  }
+
+  onFileChangessss(ev) {
+    // let workBook = null;
+    // let jsonData = null;
+    // const reader = new FileReader();
+    const file = ev.target.files[0];
+    this.convertExcelToJson(file);
+    console.log('XXXXXX 111 onFileChange this.dataSource', this.dataSource);
+    //
+    // reader.onload = (event) => {
+    //   const data = reader.result;
+    //   workBook = XLSX.read(data, { type: 'binary' });
+    //   jsonData = workBook.SheetNames.reduce((initial, name) => {
+    //     const sheet = workBook.Sheets[name];
+    //     initial[name] = XLSX.utils.sheet_to_json(sheet);
+    //     return initial;
+    //   }, {});
+    //   console.log('XXXXXX onFileChange jsonData', jsonData);
+    //   const dataString = JSON.stringify(jsonData);
+    //   console.log('XXXXXX onFileChange dataString', dataString);
+    //
+    //   const parsedJSON = JSON.parse(dataString);
+    //   // tslint:disable-next-line:prefer-for-of
+    //   console.log('XXXXXX onFileChange parsedJSON', parsedJSON);
+    //   // console.log('XXXXXX onFileChange parsedJSON.length', parsedJSON);
+    //
+    //   // for (const val of parsedJSON) {
+    //   //   console.log('XXXXXX onFileChange val', val);
+    //   // };
+    //
+    //   ELEMENT_DATA.push(parsedJSON);
+    //   console.log('XXXXXX onFileChange ELEMENT_DATA', ELEMENT_DATA);
+    //
+    //   // this.dataSource = new MatTableDataSource(ELEMENT_DATA);
+    //
+    //   console.log('XXXXXX onFileChange this.dataSource.data', this.dataSource.data);
+    //
+    //   // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat('...');
+    //   // this.setDownload(dataString);
+    // };
+    // reader.readAsBinaryString(file);
+  }
+
+  convertExcelToJson(file)
+  {
+    const reader = new FileReader();
+    let workbookkk;
+    let xLRowObject;
+    let parsedJSON = [];
+    let jsonObject;
+    reader.readAsBinaryString(file);
+    return new Promise((resolve, reject) => {
+      // tslint:disable-next-line:only-arrow-functions
+      reader.onload = function(){
+        //  alert(reader.result);
+        const data = reader.result;
+        workbookkk = read(data, {type: 'binary'});
+        console.log('XXXXXX convertExcelToJson workbookkk', workbookkk);
+        workbookkk.SheetNames.forEach(function(sheetName) {
+          // Here is your object
+          xLRowObject = utils.sheet_to_json(workbookkk.Sheets[sheetName]);
+          jsonObject = JSON.stringify(xLRowObject);
+          console.log(jsonObject);
+          console.log('XXXXXX convertExcelToJson jsonObject', jsonObject);
+          console.log(xLRowObject);
+          console.log('XXXXXX convertExcelToJson xLRowObject', xLRowObject);
+          parsedJSON = JSON.parse(jsonObject);
+          console.log('XXXXXX convertExcelToJson parsedJSON', parsedJSON);
+          resolve(xLRowObject);
+        });
+      };
+    });
+    // ELEMENT_DATA.push(xLRowObject);
+    // this.dataSource = new MatTableDataSource(ELEMENT_DATA);
+    this.dataSource.data = parsedJSON;
+  }
+
+  setDownload(data) {
+    this.willDownload = true;
+    setTimeout(() => {
+      const el = document.querySelector('#download');
+      el.setAttribute('href', `data:text/json;charset=utf-8,${encodeURIComponent(data)}`);
+      el.setAttribute('download', 'xlsxtojson.json');
+    }, 1000);
+  }
+
+
+
+
+  onFileChangeOLD(evt: any) {
   const target: DataTransfer =  (evt.target) as DataTransfer;
 
   if (target.files.length !== 1) { throw new Error('Cannot use multiple files'); }
 
   const reader: FileReader = new FileReader();
 
-  this.file= target.files[0];
+  this.file = target.files[0];
 
   // reader.readAsText(this.file);
-      // reader.onload = (e) => {
-      //   let csv: string = reader.result as string;
-      //   console.log(csv);
-      // }
+  // reader.onload = (e) => {
+  //   let csv: string = reader.result as string;
+  //   console.log('XXXXXX csv', csv);
+  // }
 
   reader.onload = (e: any) => {
     const bstr: string = e.target.result;
@@ -177,7 +306,7 @@ onFileChange(evt: any) {
     console.log('XXXXXX ws', ws);
 
      /* save data */
-     this.data = <AOA>(XLSX.utils.sheet_to_json(ws, {header: 1}));
+    this.data = ((XLSX.utils.sheet_to_json(ws, {header: 1})) as AOA);
     console.log('XXXXXX data', this.data);
     console.log('XXXXXX dataSource', this.dataSource);
 
@@ -206,6 +335,7 @@ onFileChange(evt: any) {
   .pipe().subscribe((result: any) => {
     console.log('XXXXXX Result', result);
     this.dataSource.data = result;
+    console.log('XXXXXX this.dataSource.data ', this.dataSource.data );
   }, (error: NgxCSVParserError) => {
     console.log('XXXXXX Error', error);
   });
@@ -218,11 +348,14 @@ header_diff(a1: any[], a2: Acordo[]) {
   const intersectionA = a1.filter(x => a2.includes(x));
   const diferenceA = a1.filter(x => !intersectionA.includes(x));
   console.log('XXXXXX header_diff', diferenceA);
-  
+
   return diferenceA;
 
 
 }
+
+
+
 // --> end xlsx
 
 }
