@@ -5,36 +5,24 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NgxCSVParserError } from 'ngx-csv-parser';
 import * as XLSX from 'xlsx';
 import { read, utils } from 'xlsx';
-import { Acordo } from '../model/Acordo';
+import { AcordoEnum } from '../enum/AcordoEnum';
+import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequest';
 
 
-const SCHEMA = {
-  NOME_POUPADOR: 'text',
-  CPF_POUPADOR: 'text',
-  DT_NASC_POUPADOR: 'text',
-  ENDERECO: 'text',
-  NUMERO: 'text',
-  COMPLEMENTO: 'text',
-  MUNICIPIO: 'text',
-  BAIRRO: 'text',
-  UF: 'text'
-};
+// const SCHEMA = {
+//   NOME_POUPADOR: 'text',
+//   CPF_POUPADOR: 'text',
+//   DT_NASC_POUPADOR: 'text',
+//   ENDERECO: 'text',
+//   NUMERO: 'text',
+//   COMPLEMENTO: 'text',
+//   MUNICIPIO: 'text',
+//   BAIRRO: 'text',
+//   UF: 'text'
+// };
 
-const COLUMNS = [
-  'NOME_POUPADOR',
-  'CPF_POUPADOR',
-  'DT_NASC_POUPADOR',
-  'ENDERECO',
-  'NUMERO',
-  'COMPLEMENTO',
-  'MUNICIPIO',
-  'BAIRRO',
-  'UF'
-  // ,'$$edit'
-];
-
-const ELEMENT_DATA: Acordo[] = [];
 type AOA = any[][];
+const ELEMENT_DATA: CreateDealsInCampaignRequest[] = [];
 
 @Component({
   selector: 'app-lote',
@@ -45,15 +33,15 @@ export class LoteComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder
-    // ,private ngxCsvParser: NgxCsvParser
   ) { }
 
   formulario: FormGroup;
   titulo: string;
 
-  data!: AOA;
-  displayedColumns: string[] = COLUMNS;
-  dataSchema = SCHEMA;
+  // dataSchema = SCHEMA;
+  dataHeader!: AOA;
+  dataBody!: AOA;
+  displayedColumns: string[] = Object.keys(AcordoEnum);
   dataSource = new MatTableDataSource(ELEMENT_DATA);
 
   @ViewChild(MatSort) sort: MatSort;
@@ -118,7 +106,6 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX remove id', id);
     this.dataSource.data.splice(id, 1);
     console.log('XXXXXX remove dataSource', this.dataSource);
-    // tslint:disable-next-line:no-unused-expression
     this.dataSource.sort;
     this.dataSource._updateChangeSubscription();
   }
@@ -127,6 +114,14 @@ export class LoteComponent implements OnInit {
     this.dataSource.data.push([] as never);
     console.log('XXXXXX add this.dataSource', this.dataSource);
     this.dataSource._updateChangeSubscription();
+
+    // XXXXXX TODO INICIO TESTES
+     console.log('XXXXXX add Object.values(AcordoEnum)', Object.values(AcordoEnum));
+     console.log('XXXXXX add Object.keys(AcordoEnum)', Object.keys(AcordoEnum));
+     console.log('XXXXXX add Object.assign(AcordoEnum)', Object.assign(AcordoEnum));
+     console.log('XXXXXX add Object.prototype(AcordoEnum)', Object.getPrototypeOf(AcordoEnum.BAIRRO));
+     console.log('XXXXXX add Object.entries(AcordoEnum)', Object.entries(AcordoEnum));
+     // XXXXXX FIM TESTES
   }
 
   changeValue(id: number, property: string, event: any) {
@@ -150,34 +145,53 @@ export class LoteComponent implements OnInit {
     // let parsedJSON = [];
     let jsonObject;
     reader.onload = () => {
-      //  alert(reader.result);
       const data = reader.result;
       workbookkk = read(data, { type: 'binary' });
       console.log('XXXXXX convertExcelToJson workbookkk', workbookkk);
 
-      const ws: XLSX.WorkSheet = workbookkk.Sheets[workbookkk.SheetNames[0]];
+      let ws: XLSX.WorkSheet = workbookkk.Sheets[workbookkk.SheetNames[0]];
       console.log('XXXXXX ws', ws);
 
       /* save data */
-      this.data = ((XLSX.utils.sheet_to_json(ws, { header: 1 })) as AOA);
-      console.log('XXXXXX data', this.data);
+      this.dataHeader = ((XLSX.utils.sheet_to_json(ws, { header: 1 })) as AOA);
+      console.log('XXXXXX dataHeader', this.dataHeader);
 
-      this.displayedColumns = this.data[0];
+      this.displayedColumns = this.dataHeader[0];
       console.log('XXXXXX displayedColumns', this.displayedColumns);
       this.validateColuns();
 
+      // alter HEADER names
+      this.dataBody = ((XLSX.utils.sheet_to_json(ws, { header: 0 })) as AOA);
+      console.log('XXXXXX dataBody', this.dataBody);
+
+      this.displayedColumns = Object.values(AcordoEnum);
+      console.log('XXXXXX displayedColumns2', this.displayedColumns);
+
+      // Had to create a new workbook and then add the header
+      const headerNew = [];
+      headerNew.push(this.displayedColumns);
+      console.log('XXXXXX headerNew', headerNew);
+      // const wsNew = XLSX.utils.book_new();
+      ws = XLSX.utils.book_new();
+      XLSX.utils.sheet_add_aoa(ws, headerNew);
+
+      // Starting in the second row to avoid overriding and skipping headers
+      XLSX.utils.sheet_add_json(ws, this.dataBody, { origin: 'A2', skipHeader: true });
+      console.log('XXXXXX wsNew3', ws);
+
+      // add action columns
       this.displayedColumns.push('$$edit');
 
-      xLRowObject = utils.sheet_to_json(workbookkk.Sheets[workbookkk.SheetNames[0]]);
+      // convert to JSON
+      xLRowObject = utils.sheet_to_json(ws);
       jsonObject = JSON.stringify(xLRowObject);
       console.log(jsonObject);
       console.log('XXXXXX convertExcelToJson jsonObject', jsonObject);
       console.log(xLRowObject);
       console.log('XXXXXX convertExcelToJson xLRowObject', xLRowObject);
       // parsedJSON = JSON.parse(jsonObject);
-      // console.log('XXXXXX convertExcelToJson parsedJSON', parsedJSON);
-      // @ts-ignore
       this.dataSource.data = xLRowObject;
+      // this.dataSource.data[0] = this.displayedColumns;
       console.log('XXXXXX this.dataSource.data ', this.dataSource.data);
 
       this.setDownload(jsonObject);
@@ -197,7 +211,7 @@ export class LoteComponent implements OnInit {
   }
 
   private validateColuns() {
-    const headerDiff = this.header_diff(COLUMNS, this.displayedColumns);
+    const headerDiff = this.header_diff(Object.keys(AcordoEnum), this.displayedColumns);
     console.log('XXXXXX header_diff', headerDiff);
     console.log('XXXXXX this.header_diff.length', headerDiff.length);
     if (headerDiff.length > 0) {
