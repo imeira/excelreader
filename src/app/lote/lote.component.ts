@@ -8,7 +8,6 @@ import { read, utils } from 'xlsx';
 import { AcordoEnum } from '../enum/AcordoEnum';
 import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequest';
 
-
 // const SCHEMA = {
 //   NOME_POUPADOR: 'text',
 //   CPF_POUPADOR: 'text',
@@ -20,6 +19,7 @@ import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequ
 //   BAIRRO: 'text',
 //   UF: 'text'
 // };
+
 
 type AOA = any[][];
 const ELEMENT_DATA: CreateDealsInCampaignRequest[] = [];
@@ -49,12 +49,12 @@ export class LoteComponent implements OnInit {
   willDownload = true;
   editField: string;
 
-
   file!: File;
 
-  // ngAfterViewInit() {
-  //   this.dataSource.sort = this.sort;
-  // }
+  // tslint:disable-next-line:use-lifecycle-interface
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
 
   ngOnInit() {
     this.formulario = this.formBuilder.group({
@@ -62,11 +62,11 @@ export class LoteComponent implements OnInit {
     });
   }
 
-  //  applyFilter(filterValue: string) {
-  //   filterValue = filterValue.trim(); // Remove whitespace
-  //   filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-  //   this.dataSource.filter = filterValue;
-  // }
+   applyFilter(filterValue: string) {
+    filterValue = filterValue.trim(); // Remove whitespace
+    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.filter = filterValue;
+  }
 
   confirmEdit(event: any) {
     console.log('XXXXXX confirmEdit event', event);
@@ -86,6 +86,7 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX updateList editField', editField);
     console.log('XXXXXX updateList this.dataSource', this.dataSource);
     console.log('XXXXXX updateList event', event);
+    // @ts-ignore
     this.dataSource.data = this.dataSource.data.map((e, i) => {
       if (id === i) {
         return {
@@ -114,14 +115,11 @@ export class LoteComponent implements OnInit {
     this.dataSource.data.push([] as never);
     console.log('XXXXXX add this.dataSource', this.dataSource);
     this.dataSource._updateChangeSubscription();
+  }
 
-    // XXXXXX TODO INICIO TESTES
-     console.log('XXXXXX add Object.values(AcordoEnum)', Object.values(AcordoEnum));
-     console.log('XXXXXX add Object.keys(AcordoEnum)', Object.keys(AcordoEnum));
-     console.log('XXXXXX add Object.assign(AcordoEnum)', Object.assign(AcordoEnum));
-     console.log('XXXXXX add Object.prototype(AcordoEnum)', Object.getPrototypeOf(AcordoEnum.BAIRRO));
-     console.log('XXXXXX add Object.entries(AcordoEnum)', Object.entries(AcordoEnum));
-     // XXXXXX FIM TESTES
+  getPropertyView(col: any): string {
+    const colView = col + 'View';
+    return new CreateDealsInCampaignRequest(colView).get(colView);
   }
 
   changeValue(id: number, property: string, event: any) {
@@ -164,6 +162,7 @@ export class LoteComponent implements OnInit {
       this.dataBody = ((XLSX.utils.sheet_to_json(ws, { header: 0 })) as AOA);
       console.log('XXXXXX dataBody', this.dataBody);
 
+      // this.displayedColumns = ObjectHelper.getNamesToView(AcordoEnum);
       this.displayedColumns = Object.values(AcordoEnum);
       console.log('XXXXXX displayedColumns2', this.displayedColumns);
 

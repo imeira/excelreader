@@ -1,9 +1,13 @@
+import {Proxy} from './Proxy';
 
-export class CreateDealsInCampaignRequest {
+export class CreateDealsInCampaignRequest extends Proxy {
 
-  constructor() { }
+  constructor(kwArgs: {}) {
+    super(kwArgs);
+  }
 
   TipoPessoa: number; // TODO Criar Enum ajustar entidade
+
   PoupadorNome: string;
   PoupadorCPF: string; // TODO VALIDAR CPF válido ou CNPJ valido
   PoupadorDtNascimento: Date; // TODO Preenchido automaticamente
@@ -63,4 +67,39 @@ export class CreateDealsInCampaignRequest {
   DvContaAdvogado: string;
   CampanhaTipoId: number;
 
+  get(key: string): any {
+    const getter: string = '_' + key + 'Getter';
+    return this[getter] ? this[getter]() : super.get(key);
+  }
+
+  get PoupadorNomeView(): string {
+    return 'Poupador';
+  }
+  get PoupadorCPFView(): string {
+    return 'CPF';
+  }
+  get PoupadorDtNascimentoView(): string {
+    return 'Data Nascimento';
+  }
+  get PoupadorEnderecoView(): string {
+    return 'Endereço';
+  }
+  get PoupadorEnderecoCEPView(): string {
+    return 'CEP';
+  }
+  get PoupadorEnderecoNumeroView(): string {
+    return 'Numero';
+  }
+  get PoupadorEnderecoComplementoView(): string {
+    return 'Complemento';
+  }
+  get PoupadorEnderecoMunicipioView(): string {
+    return 'Municipio';
+  }
+  get PoupadorEnderecoBairroView(): string {
+    return 'Bairro';
+  }
+  get PoupadorEnderecoUFView(): string {
+    return 'UF';
+  }
 }

@@ -17,7 +17,7 @@
 
 <br><br>
 
-
+<ng-form id="formulario" name="formulario">
 <!-- Sucess table -->
 <div class="card" *ngIf="dataSource.data && dataSource.data.length > 0">
   <h3 class="card-header text-center font-weight-bold text-uppercase py-4">{{titulo}}</h3>
@@ -32,7 +32,7 @@
         <ng-container matColumnDef="{{col}}" *ngFor="let col of displayedColumns">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>
             <span *ngIf="col !== '$$edit'">
-              {{col}}
+              {{getPropertyView(col)}}
             </span>
             <span *ngIf="col == '$$edit'">
               Ações
@@ -53,7 +53,6 @@
             <div *ngIf="element.isEdit">
               <div class="btn-edit" *ngIf="col === '$$edit'; else dateField">
                 <button (click)="confirmEdit($event); element.isEdit = !element.isEdit">Confirmar</button>
-                <!-- <button (click)="cancelEdit(); element.isEdit = !element.isEdit">Cancelar</button> -->
               </div>
               <ng-template #dateField>
                  <!-- <mat-form-field appearance="fill" #elseDate *ngIf="dataSchema[col] === 'date'; else defaultField">  -->
@@ -66,7 +65,7 @@
               </ng-template>
               <ng-template #defaultField>
                 <mat-form-field>
-                  <mat-label>{{col}}</mat-label>
+                  <mat-label>{{getPropertyView(col)}}</mat-label>
                    <!-- <input (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" type="{{dataSchema[col]}}" matInput value="{{element[col]}}"> -->
                    <input (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" matInput value="{{element[col]}}">
                 </mat-form-field>
@@ -81,7 +80,7 @@
   </div>
 </div>
 <!-- Sucess table -->
-
+</ng-form>
 
   </div>
 </div>
