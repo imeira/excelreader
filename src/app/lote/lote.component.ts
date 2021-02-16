@@ -7,6 +7,8 @@ import * as XLSX from 'xlsx';
 import { read, utils } from 'xlsx';
 import { AcordoEnum } from '../enum/AcordoEnum';
 import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequest';
+import {LoteService} from '../services/lote.service';
+import { ToastrService } from 'ngx-toastr';
 
 // const SCHEMA = {
 //   NOME_POUPADOR: 'text',
@@ -32,6 +34,8 @@ const ELEMENT_DATA: CreateDealsInCampaignRequest[] = [];
 export class LoteComponent implements OnInit {
 
   constructor(
+    private loteService: LoteService,
+    private toastr: ToastrService,
     private formBuilder: FormBuilder
   ) { }
 
@@ -57,9 +61,19 @@ export class LoteComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.validation();
+  }
+
+  validation() {
     this.formulario = this.formBuilder.group({
-      busca: [null, Validators.required],
+      busca: [null, Validators.required]
+      // tema: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
+      // local: ['', Validators.required],
+      // qtdPessoas: ['', [Validators.required, Validators.max(120000)]],
+      // telefone: ['', Validators.required],
+      // email: ['', [Validators.required, Validators.email]]
     });
+
   }
 
    applyFilter(filterValue: string) {
@@ -71,6 +85,7 @@ export class LoteComponent implements OnInit {
   confirmEdit(event: any) {
     console.log('XXXXXX confirmEdit event', event);
     this.dataSource._updateChangeSubscription();
+    this.toastr.success('Linha editada com Sucesso!');
   }
 
   cancelEdit() {
@@ -109,12 +124,26 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX remove dataSource', this.dataSource);
     this.dataSource.sort;
     this.dataSource._updateChangeSubscription();
+    this.toastr.success('Linha removida com Sucesso!');
   }
 
   add() {
     this.dataSource.data.push([] as never);
     console.log('XXXXXX add this.dataSource', this.dataSource);
+    setTimeout(() => {
+      const el = document.getElementById('editButton' + (this.dataSource.data.length - 1));
+      if (el != null) {
+        el.click();
+        setTimeout(() => {
+          const e2 = document.getElementById('Poupador' + (this.dataSource.data.length - 1));
+          if (e2 != null) {
+            e2.focus();
+          }
+        }, 300);
+      }
+    }, 300);
     this.dataSource._updateChangeSubscription();
+    this.toastr.success('Linha adicionada com Sucesso!');
   }
 
   getPropertyView(col: any): string {
@@ -129,10 +158,23 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX changeValue editField', this.editField);
   }
 
+  register() {
+    if (this.formulario.valid) {
+      this.dataSource.data.push([] as never);
+      console.log('XXXXXX register this.dataSource', this.dataSource);
+      this.dataSource._updateChangeSubscription();
+      this.toastr.success('Arquivo carregado com Sucesso!');
+    }
+  }
+
   onFileChange(evt: any) {
     const target: DataTransfer = (evt.target) as DataTransfer;
 
-    if (target.files.length !== 1) { throw new Error('Cannot use multiple files'); }
+    if (target.files.length !== 1) {
+      this.toastr.error(`É permitido carregar um arquivo por vez!`);
+      this.dataSource.data = [];
+      throw new Error('Cannot use multiple files');
+    }
 
     const reader: FileReader = new FileReader();
 
@@ -156,7 +198,13 @@ export class LoteComponent implements OnInit {
 
       this.displayedColumns = this.dataHeader[0];
       console.log('XXXXXX displayedColumns', this.displayedColumns);
-      this.validateColuns();
+
+      if (!this.validateColuns()) {
+        console.log('XXXXXX NgxCSVParserError! ');
+        this.dataSource.data = [];
+        this.toastr.error(`Formato de arquivo invalido! Clique para baixar o Modelo!`);
+        throw new NgxCSVParserError();
+      }
 
       // alter HEADER names
       this.dataBody = ((XLSX.utils.sheet_to_json(ws, { header: 0 })) as AOA);
@@ -209,15 +257,14 @@ export class LoteComponent implements OnInit {
     return diferenceA;
   }
 
-  private validateColuns() {
+  private validateColuns(): boolean {
     const headerDiff = this.header_diff(Object.keys(AcordoEnum), this.displayedColumns);
     console.log('XXXXXX header_diff', headerDiff);
     console.log('XXXXXX this.header_diff.length', headerDiff.length);
     if (headerDiff.length > 0) {
-      console.log('XXXXXX NgxCSVParserError Formato de arquivo invalido ');
-      this.dataSource.data = [];
-      throw new NgxCSVParserError();
+      return false;
     }
+    return true;
   }
 
   setDownload(data: any) {

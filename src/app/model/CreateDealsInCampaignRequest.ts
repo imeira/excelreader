@@ -6,6 +6,8 @@ export class CreateDealsInCampaignRequest extends Proxy {
     super(kwArgs);
   }
 
+  id: number;
+
   TipoPessoa: number; // TODO Criar Enum ajustar entidade
 
   PoupadorNome: string;

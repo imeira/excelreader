@@ -9,7 +9,7 @@
     <h5><a id="download"> <u>Clique aqui</u> para baixar o Modelo da planilha. </a></h5>
 
 
-     <input type="file" (change)="onFileChange($event)" accept=".csv,.xls,.xlsx" multiple="false" />
+     <input id="busca" name="busca" type="file" (change)="onFileChange($event)" accept=".csv,.xls,.xlsx" multiple="false" />
 
     <div id="output"></div>
     <br>
@@ -24,11 +24,18 @@
  <div class="card-body">
    <div id="table" class="table-editable">
      <span class="table-add float-left mb-3 mr-2">
-       <a class="text-success" (click)="add()">
+       <a class="text-success" (click)="add()" label="Adiconar linha" alt="Adiconar linha">
          <mdb-icon fas icon="plus" size="2x"></mdb-icon>
        </a>
      </span>
-      <table class="voxel-table mat-elevation-z8 table" mat-table matSort [dataSource]="dataSource">
+     <span class="table-add float-right mb-3 mr-2">
+       <a class="text-success">
+         <button class="btn btn-success" [disabled]="!formulario.valid" (click)="register()" >
+            <i class="fa -fast-forward">Processar Planilha</i>
+         </button>
+       </a>
+     </span>
+      <table #tableSuccess id="tableSuccess" class="voxel-table mat-elevation-z8 table" mat-table matSort [dataSource]="dataSource">
         <ng-container matColumnDef="{{col}}" *ngFor="let col of displayedColumns">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>
             <span *ngIf="col !== '$$edit'">
@@ -41,7 +48,7 @@
           <td mat-cell *matCellDef="let element; let i = index;">
             <div *ngIf="!element.isEdit">
               <div class="btn-edit" *ngIf="col === '$$edit'; spanHeader" >
-                <button (click)="element.isEdit = !element.isEdit">Editar</button>
+                <button id="editButton{{i}}" (click)="element.isEdit = !element.isEdit">Editar</button>
                 <span class="btn-remove">
                   <button (click)="remove(i)" color="danger">Remover</button>
                 </span>
@@ -67,7 +74,7 @@
                 <mat-form-field>
                   <mat-label>{{getPropertyView(col)}}</mat-label>
                    <!-- <input (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" type="{{dataSchema[col]}}" matInput value="{{element[col]}}"> -->
-                   <input (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" matInput value="{{element[col]}}">
+                   <input id="{{getPropertyView(col)}}{{i}}" (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" matInput value="{{element[col]}}">
                 </mat-form-field>
               </ng-template>
             </div>
