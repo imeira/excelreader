@@ -1,5 +1,5 @@
 <script lang="javascript" src="dist/xlsx.full.min.js"></script>
-
+<form [formGroup]="formulario" (ngSubmit)="formulario.valid" novalidate>
 <div class="component-container">
   <div class="inicio-container">
     <h2>Cadastro de Acordo em Lote</h2>
@@ -8,12 +8,10 @@
     </p>
     <h5><a id="download"> <u>Clique aqui</u> para baixar o Modelo da planilha. </a></h5>
 
-
-     <input id="busca" name="busca" type="file" (change)="onFileChange($event)" accept=".csv,.xls,.xlsx" multiple="false" />
+     <input formControlName="busca" id="busca" name="busca" type="file" (change)="onFileChange($event)" accept=".csv,.xls,.xlsx" multiple="false" />
 
     <div id="output"></div>
     <br>
-
 
 <br><br>
 
@@ -30,7 +28,7 @@
      </span>
      <span class="table-add float-right mb-3 mr-2">
        <a class="text-success">
-         <button class="btn btn-success" [disabled]="!formulario.valid" (click)="register()" >
+         <button type="submit" class="btn btn-success" [disabled]="!formulario.valid" (click)="register()" >
             <i class="fa -fast-forward">Processar Planilha</i>
          </button>
        </a>
@@ -62,10 +60,9 @@
                 <button (click)="confirmEdit($event); element.isEdit = !element.isEdit">Confirmar</button>
               </div>
               <ng-template #dateField>
-                 <!-- <mat-form-field appearance="fill" #elseDate *ngIf="dataSchema[col] === 'date'; else defaultField">  -->
-                 <mat-form-field appearance="fill" #elseDate *ngIf="false; else defaultField">
-                  <mat-label>Choose a date</mat-label>
-                  <input matInput [matDatepicker]="picker" value="{{element[col]}}">
+                <mat-form-field appearance="fill" #elseDate *ngIf="dataSchema[col] === 'date'; else defaultField">
+                  <mat-label>{{getPropertyView(col)}}</mat-label>
+                  <input matInput [matDatepicker]="picker" value="{{element[col]}}" (blur)="changeValue(i, col, $event); updateList(i, col, $event)" value="{{element[col]}}">
                   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>
@@ -73,8 +70,7 @@
               <ng-template #defaultField>
                 <mat-form-field>
                   <mat-label>{{getPropertyView(col)}}</mat-label>
-                   <!-- <input (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" type="{{dataSchema[col]}}" matInput value="{{element[col]}}"> -->
-                   <input id="{{getPropertyView(col)}}{{i}}" (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" matInput value="{{element[col]}}">
+                   <input matInput  id="{{getPropertyView(col)}}{{i}}" (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" value="{{element[col]}}" type="{{dataSchema[col]}}">
                 </mat-form-field>
               </ng-template>
             </div>
@@ -91,3 +87,4 @@
 
   </div>
 </div>
+</form>

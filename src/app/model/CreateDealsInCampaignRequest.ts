@@ -8,31 +8,21 @@ export class CreateDealsInCampaignRequest extends Proxy {
 
   id: number;
 
-  TipoPessoa: number; // TODO Criar Enum ajustar entidade
+  TipoPessoa: number;
 
   PoupadorNome: string;
-  PoupadorCPF: string; // TODO VALIDAR CPF válido ou CNPJ valido
-  PoupadorDtNascimento: Date; // TODO Preenchido automaticamente
-  PoupadorEndereco: string; // TODO Será preenchido automaticoa
-  PoupadorEnderecoCEP: string; // TODO Será preenchido automaticoa
-  PoupadorEnderecoNumero: string;  // TODO Será preenchido automaticoa
-  PoupadorEnderecoComplemento: string;  // TODO Será preenchido automaticoa
-  PoupadorEnderecoMunicipio: string;  // TODO Será preenchido automaticoa
-  PoupadorEnderecoBairro: string;  // TODO Será preenchido automaticoa
-  PoupadorEnderecoUF: string;  // TODO Será preenchido automaticoa
-//    <summary>
-//    Prenchimento obrigatório
-//    No mínimo catorze e até vinte caracteres numéricos.
-//    O campo deve ser formatado pelo sistema com a seguinte máscara: 0000000-00.0000.0.00.0000.
-//    </summary>
-//    <value></value>
-  NumeroProcessoCNJ: string;  // TODO VALIDAR CNPJ val
-// <summary>
-// Dados do Processo: O campo Número do BJ é de preenchimento obrigatório
-// Apenas caracteres numéricos com até 12 dígitos no formato 000000000000
-// </summary>
-// <value></value>
-  CodigoBJ: string; // TODO Validar tamanho
+  PoupadorCPF: string;
+  PoupadorDtNascimento: Date;
+  PoupadorEndereco: string;
+  PoupadorEnderecoNumero: string;
+  PoupadorEnderecoComplemento: string;
+  PoupadorEnderecoMunicipio: string;
+  PoupadorEnderecoBairro: string;
+  PoupadorEnderecoUF: string;
+
+  PoupadorEnderecoCEP: string;
+  NumeroProcessoCNJ: string;
+  CodigoBJ: string;
   DtAjuizamento: Date;
   OrgaoLegal: string;
   Vara: string;
@@ -41,11 +31,11 @@ export class CreateDealsInCampaignRequest extends Proxy {
   TipoAcao: string;
   PossuiAdvogado: boolean;
   AdvogadoNome: string;
-  AdvogadoCPF: string; // TODO VALIDAR CNPJ valido
+  AdvogadoCPF: string;
   AdvogadoOABMatricula: string;
   AdvogadoOABMatriculaUF: string;
   AdvogadoPJRazaoSocial: string;
-  AdvogadoPJCNPJ: string; // TODO VALIDAR CNPJ valido
+  AdvogadoPJCNPJ: string;
   AdvogadoPJOptanteSimples: string;
   ValorAcordoPoupador: number;
   ValorHonorarios: number;

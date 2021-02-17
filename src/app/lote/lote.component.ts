@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgxCSVParserError } from 'ngx-csv-parser';
@@ -9,22 +9,23 @@ import { AcordoEnum } from '../enum/AcordoEnum';
 import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequest';
 import {LoteService} from '../services/lote.service';
 import { ToastrService } from 'ngx-toastr';
+import {Observable} from "rxjs";
 
-// const SCHEMA = {
-//   NOME_POUPADOR: 'text',
-//   CPF_POUPADOR: 'text',
-//   DT_NASC_POUPADOR: 'text',
-//   ENDERECO: 'text',
-//   NUMERO: 'text',
-//   COMPLEMENTO: 'text',
-//   MUNICIPIO: 'text',
-//   BAIRRO: 'text',
-//   UF: 'text'
-// };
+const SCHEMA = {
+  PoupadorNome: 'text',
+  PoupadorCPF: 'text',
+  PoupadorDtNascimento: 'date',
+  PoupadorEndereco: 'text',
+  PoupadorEnderecoNumero: 'text',
+  PoupadorEnderecoComplemento: 'text',
+  PoupadorEnderecoMunicipio: 'text',
+  PoupadorEnderecoBairro: 'text',
+  PoupadorEnderecoUF: 'text'
+};
 
 
 type AOA = any[][];
-const ELEMENT_DATA: CreateDealsInCampaignRequest[] = [];
+// const ELEMENT_DATA: CreateDealsInCampaignRequest[] = [];
 
 @Component({
   selector: 'app-lote',
@@ -39,14 +40,19 @@ export class LoteComponent implements OnInit {
     private formBuilder: FormBuilder
   ) { }
 
-  formulario: FormGroup;
   titulo: string;
+  formulario: FormGroup;
 
-  // dataSchema = SCHEMA;
+
+  dataSchema = SCHEMA;
   dataHeader!: AOA;
   dataBody!: AOA;
-  displayedColumns: string[] = Object.keys(AcordoEnum);
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  displayedColumns: string[];
+  // dataSource = new MatTableDataSource(ELEMENT_DATA);
+  dataSource = new MatTableDataSource < CreateDealsInCampaignRequest > ();
+
+  createDealsInCampaignRequest: CreateDealsInCampaignRequest;
+  createDealsInCampaignRequestArray: CreateDealsInCampaignRequest[] = [];
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -99,7 +105,7 @@ export class LoteComponent implements OnInit {
     // const editField = event.target.textContent;
     const editField = event.target.value;
     console.log('XXXXXX updateList editField', editField);
-    console.log('XXXXXX updateList this.dataSource', this.dataSource);
+    console.log('XXXXXX updateList this.dataSource.data', this.dataSource.data);
     console.log('XXXXXX updateList event', event);
     // @ts-ignore
     this.dataSource.data = this.dataSource.data.map((e, i) => {
@@ -115,13 +121,14 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX updateList data', data);
     this.dataSource._updateChangeSubscription();
 
-    console.log('XXXXXX updateList new this.dataSource', this.dataSource);
+    console.log('XXXXXX updateList new this.dataSource.data', this.dataSource.data);
   }
 
   remove(id: any) {
     console.log('XXXXXX remove id', id);
     this.dataSource.data.splice(id, 1);
     console.log('XXXXXX remove dataSource', this.dataSource);
+    // tslint:disable-next-line:no-unused-expression
     this.dataSource.sort;
     this.dataSource._updateChangeSubscription();
     this.toastr.success('Linha removida com Sucesso!');
@@ -135,7 +142,7 @@ export class LoteComponent implements OnInit {
       if (el != null) {
         el.click();
         setTimeout(() => {
-          const e2 = document.getElementById('Poupador' + (this.dataSource.data.length - 1));
+          const e2 = document.getElementById('PoupadorNome' + (this.dataSource.data.length - 1));
           if (e2 != null) {
             e2.focus();
           }
@@ -158,12 +165,32 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX changeValue editField', this.editField);
   }
 
+  setCreateDealsInCampaignRequestArrayByDataSource(): void {
+    this.createDealsInCampaignRequestArray = JSON.parse(JSON.stringify(this.dataSource.data));
+    console.log('XXXXXX this.createDealsInCampaignRequestArray', this.createDealsInCampaignRequestArray);
+  }
+
+  validateCreateDealsInCampaignRequest(model: CreateDealsInCampaignRequest): Observable<CreateDealsInCampaignRequest> {
+    console.log('XXXXXX validateCreateDealsInCampaignRequest createDealsInCampaignRequest', model);
+    return this.loteService
+      .validateCreateDealsInCampaignRequest(model);
+  }
+
   register() {
+    console.log('XXXXXX register this.dataSource1.data', this.dataSource.data);
     if (this.formulario.valid) {
-      this.dataSource.data.push([] as never);
-      console.log('XXXXXX register this.dataSource', this.dataSource);
-      this.dataSource._updateChangeSubscription();
-      this.toastr.success('Arquivo carregado com Sucesso!');
+      this.setCreateDealsInCampaignRequestArrayByDataSource();
+      this.loteService
+        .postCreateDealsInCampaignRequest(this.createDealsInCampaignRequestArray).subscribe({
+        next: data => {
+          console.log('XXXXXX register data.id', data.id);
+          this.toastr.success('Arquivo registrado com Sucesso!');
+        },
+        error: error => {
+          this.toastr.error(error.message);
+          console.error('There was an error!', error);
+        }
+      });
     }
   }
 
