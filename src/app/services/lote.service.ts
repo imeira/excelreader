@@ -43,7 +43,7 @@ export class LoteService {
       );
   }
 
-  postCreateDealsInCampaignRequest(array: CreateDealsInCampaignRequest[]): Observable<CreateDealsInCampaignRequest> {
+  postCreateDealsInCampaignRequest(array: CreateDealsInCampaignRequest[]): Observable<CreateDealsInCampaignRequest> | null {
     array.forEach(createDealsInCampaignRequest => {
       console.log('XXXXXX LoteService.postCreateDealsInCampaignRequest createDealsInCampaignRequest', createDealsInCampaignRequest);
       return this.http.post<CreateDealsInCampaignRequest>(this.baseURL, createDealsInCampaignRequest, httpOptions)
