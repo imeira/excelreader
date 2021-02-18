@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSort } from '@angular/material/sort';
+import { Component, OnInit } from '@angular/core';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgxCSVParserError } from 'ngx-csv-parser';
 import * as XLSX from 'xlsx';
@@ -23,9 +22,6 @@ const SCHEMA = {
   PoupadorEnderecoUF: 'text'
 };
 
-
-type AOA = any[][];
-
 @Component({
   selector: 'app-lote',
   templateUrl: './lote.component.html',
@@ -35,115 +31,65 @@ export class LoteComponent implements OnInit {
 
   constructor(
     private loteService: LoteService,
-    private toastr: ToastrService,
-    private fb: FormBuilder
+    private toastr: ToastrService
   ) { }
 
   titulo: string;
 
   dataSchema = SCHEMA;
-  dataHeader!: AOA;
-  dataBody!: AOA;
+  dataHeader!: any[][];
+  dataBody!: any[][];
   displayedColumns: string[];
-  dataSource = new MatTableDataSource <CreateDealsInCampaignRequest>();
+  dataSource = new MatTableDataSource <any>();
   createDealsInCampaignRequestArray: CreateDealsInCampaignRequest[] = [];
 
-  @ViewChild(MatSort) sort: MatSort;
-
   willDownload = true;
-  editField: string;
-
   file!: File;
-
-  parentForm: FormGroup;
-  childArray: FormArray;
-  invalid = false;
+  form: FormGroup;
 
   ngOnInit() {
-    this.validation();
+    this.form = new FormGroup({ deals: new FormArray([]) });
   }
 
-  validation() {
+  setFormGroup(line: any): void {
+    // @ts-ignore
+    this.form.get('deals').push(new FormGroup({
+      PoupadorNome: new FormControl(line != null ? line.PoupadorNome : null, [Validators.required]),
+      PoupadorCPF: new FormControl(line != null ? line.PoupadorCPF : null, [Validators.required]),
+      PoupadorDtNascimento: new FormControl(line != null ? line.PoupadorDtNascimento : null, [Validators.required]),
+      PoupadorEndereco: new FormControl(line != null ? line.PoupadorEndereco : null, [Validators.required]),
+      PoupadorEnderecoNumero: new FormControl(line != null ? line.PoupadorEnderecoNumero : null, [Validators.required]),
+      PoupadorEnderecoComplemento: new FormControl(line != null ? line.PoupadorEnderecoComplemento : null, [Validators.required]),
+      PoupadorEnderecoMunicipio: new FormControl(line != null ? line.PoupadorEnderecoMunicipio : null, [Validators.required]),
+      PoupadorEnderecoBairro: new FormControl(line != null ? line.PoupadorEnderecoBairro : null, [Validators.required]),
+      PoupadorEnderecoUF: new FormControl(line != null ? line.PoupadorEnderecoUF : null, [Validators.required])
+      // CEP:  [null, [Validators.required, FormValidations.cepvalidator]]
+    }));
+  }
 
-    this.parentForm = this.fb.group({
-      busca: [null, Validators.required],
-      // createDealsInCampaignRequest: this.fb.group({
-      //   PoupadorNome: [null, Validators.required],
-      //   PoupadorCPF: [null, Validators.required],
-      //   PoupadorDtNascimento: [null, Validators.required],
-      //   PoupadorEndereco: [null, Validators.required],
-      //   PoupadorEnderecoNumero: [null, Validators.required],
-      //   PoupadorEnderecoComplemento: [null, Validators.required],
-      //   PoupadorEnderecoMunicipio: [null, Validators.required],
-      //   PoupadorEnderecoBairro: [null, Validators.required],
-      //   PoupadorEnderecoUF: [null, Validators.required]
-      // }),
-      childArray: this.fb.array([])
+  loadform(): void {
+    this.createDealsInCampaignRequestArray.forEach(line => {
+      this.setFormGroup(line);
+      console.log('XXX loadform Line', line[0]);
+      console.log('XXX loadform FORM', this.form);
     });
+  }
+
+  checkError = (controlName: string, errorName: string, element: FormGroup) => {
+    // console.log('controlName:', controlName, ' errorName:', errorName, ' Value:', element.controls[controlName].value);
+    return element.controls[controlName].hasError(errorName);
   }
 
   showValidation(fromgroup: FormGroup) {
     Object.keys(fromgroup.controls).forEach(campo => {
       const controle = fromgroup.get(campo);
       if (controle != null && controle.invalid) {
-        this.invalid = true;
         controle.markAsDirty();
-
       }
       if (controle instanceof FormGroup) {
         this.showValidation(controle);
       }
     });
-  }
-  createChildArray(createDealsInCampaignRequest: CreateDealsInCampaignRequest): FormGroup {
-    return this.fb.group({
-      PoupadorNome: new FormControl(createDealsInCampaignRequest.PoupadorNome, [Validators.required]),
-      PoupadorCPF: new FormControl(createDealsInCampaignRequest.PoupadorCPF, [Validators.required]),
-      PoupadorDtNascimento: new FormControl(createDealsInCampaignRequest.PoupadorDtNascimento, [Validators.required]),
-      PoupadorEndereco: new FormControl(createDealsInCampaignRequest.PoupadorEndereco, [Validators.required]),
-      PoupadorEnderecoNumero: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoNumero, [Validators.required]),
-      PoupadorEnderecoComplemento: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoComplemento, [Validators.required]),
-      PoupadorEnderecoMunicipio: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoMunicipio, [Validators.required]),
-      PoupadorEnderecoBairro: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoBairro, [Validators.required]),
-      PoupadorEnderecoUF: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoUF, [Validators.required])
-      // CEP:  [null, [Validators.required, FormValidations.cepvalidator]]
-    });
-  }
-
-
-  createChildArrayNew(): FormGroup {
-    return this.fb.group({
-      PoupadorNome: [null, Validators.required],
-      PoupadorCPF: [null, Validators.required],
-      PoupadorDtNascimento: [null, Validators.required],
-      PoupadorEndereco: [null, Validators.required],
-      PoupadorEnderecoNumero: [null, Validators.required],
-      PoupadorEnderecoComplemento: [null, Validators.required],
-      PoupadorEnderecoMunicipio: [null, Validators.required],
-      PoupadorEnderecoBairro: [null, Validators.required],
-      PoupadorEnderecoUF: [null, Validators.required]
-    });
-  }
-
-  aplicaCssErro(input: string) {
-    const control = this.parentForm.get(input);
-    // tslint:disable-next-line:early-exit
-    if (control != null) {
-      return {
-        'is-invalid' : control.invalid && (control.touched || control.dirty)
-      };
-    }
-  }
-
-  confirmEdit(event: any) {
-    console.log('XXXXXX confirmEdit event', event);
-    this.dataSource._updateChangeSubscription();
-    this.toastr.success('Linha editada com Sucesso!');
-  }
-
-  cancelEdit() {
-    console.log('XXXXXX cancelEdit');
-    this.dataSource._updateChangeSubscription();
   }
 
   updateList(id: number, property: string, event: any) {
@@ -181,36 +127,28 @@ export class LoteComponent implements OnInit {
     this.toastr.success('Linha removida com Sucesso!');
   }
 
+
   add() {
-    this.dataSource.data.push([] as never);
+    this.setFormGroup(null);
+    // this.dataSource = new MatTableDataSource((this.form.get('deals') as FormArray).controls);
+    // this.dataSource.data.push(new MatTableDataSource <any>());
+    this.dataSource._updateChangeSubscription();
     console.log('XXXXXX add this.dataSource', this.dataSource);
     setTimeout(() => {
-      const el = document.getElementById('editButton' + (this.dataSource.data.length - 1));
-      // tslint:disable-next-line:early-exit
-      if (el != null) {
-        el.click();
-        setTimeout(() => {
-          const e2 = document.getElementById('PoupadorNome' + (this.dataSource.data.length - 1));
-          if (e2 != null) {
-            e2.focus();
-          }
-        }, 300);
+      console.log('XXXXXX add this.e2 field ', 'PoupadorNome' + (this.dataSource.data.length - 1));
+      const e2 = document.getElementById('PoupadorNome' + (this.dataSource.data.length - 1));
+      console.log('XXXXXX add this.e2', e2);
+      if (e2 != null) {
+        e2.click();
+        e2.focus();
       }
     }, 300);
-    this.dataSource._updateChangeSubscription();
     this.toastr.success('Linha adicionada com Sucesso!');
   }
 
   getPropertyView(col: any): string {
     const colView = col + 'View';
     return new CreateDealsInCampaignRequest(colView).get(colView);
-  }
-
-  changeValue(id: number, property: string, event: any) {
-    console.log('XXXXXX changeValue id', id);
-    console.log('XXXXXX changeValue property', property);
-    this.editField = event.target.textContent;
-    console.log('XXXXXX changeValue editField', this.editField);
   }
 
   setCreateDealsInCampaignRequestArrayByDataSource(): void {
@@ -226,7 +164,7 @@ export class LoteComponent implements OnInit {
 
   onSubmit() {
     console.log('XXXXXX register this.dataSource1.data', this.dataSource.data);
-    if (this.parentForm.valid) {
+    if (this.form.valid) {
       this.setCreateDealsInCampaignRequestArrayByDataSource();
       this.loteService
         .postCreateDealsInCampaignRequest(this.createDealsInCampaignRequestArray).subscribe({
@@ -240,17 +178,16 @@ export class LoteComponent implements OnInit {
           }});
     } else {
       console.log('invalido');
-      this.invalid = true;
-      this.showValidation(this.parentForm);
+      this.showValidation(this.form);
     }
   }
 
   onFileChange(evt: any) {
     const target: DataTransfer = (evt.target) as DataTransfer;
+    this.dataSource.data = [];
 
     if (target.files.length !== 1) {
       this.toastr.error(`É permitido carregar um arquivo por vez!`);
-      this.dataSource.data = [];
       throw new Error('Cannot use multiple files');
     }
 
@@ -258,19 +195,17 @@ export class LoteComponent implements OnInit {
 
     this.file = target.files[0];
     this.titulo = this.file.name;
-    let workbookkk;
     let xLRowObject;
-    let jsonObject;
     reader.onload = () => {
       const data = reader.result;
-      workbookkk = read(data, { type: 'binary' });
+      const workbookkk = read(data, { type: 'binary' });
       console.log('XXXXXX convertExcelToJson workbookkk', workbookkk);
-
       let ws: XLSX.WorkSheet = workbookkk.Sheets[workbookkk.SheetNames[0]];
       console.log('XXXXXX ws', ws);
 
       /* save data */
-      this.dataHeader = ((XLSX.utils.sheet_to_json(ws, { header: 1 })) as AOA);
+      console.log('XXXXXX fileList', XLSX.utils.sheet_to_json(ws, { raw: true }));
+      this.dataHeader = ((XLSX.utils.sheet_to_json(ws, { header: 1 })));
       console.log('XXXXXX dataHeader', this.dataHeader);
 
       this.displayedColumns = this.dataHeader[0];
@@ -278,13 +213,12 @@ export class LoteComponent implements OnInit {
 
       if (!this.validateColuns()) {
         console.log('XXXXXX NgxCSVParserError! ');
-        this.dataSource.data = [];
         this.toastr.error(`Formato de arquivo invalido! Clique para baixar o Modelo!`);
         throw new NgxCSVParserError();
       }
 
       // alter HEADER names
-      this.dataBody = ((XLSX.utils.sheet_to_json(ws, { header: 0 })) as AOA);
+      this.dataBody = ((XLSX.utils.sheet_to_json(ws, { header: 0 })));
       console.log('XXXXXX dataBody', this.dataBody);
 
       // this.displayedColumns = ObjectHelper.getNamesToView(AcordoEnum);
@@ -308,32 +242,22 @@ export class LoteComponent implements OnInit {
 
       // convert to JSON
       xLRowObject = utils.sheet_to_json(ws);
-      jsonObject = JSON.stringify(xLRowObject);
-      console.log(jsonObject);
-      console.log('XXXXXX convertExcelToJson jsonObject', jsonObject);
       console.log(xLRowObject);
       console.log('XXXXXX convertExcelToJson xLRowObject', xLRowObject);
-      // @ts-ignore
       this.dataSource.data = xLRowObject;
       this.setCreateDealsInCampaignRequestArrayByDataSource();
-      this.childArray = this.fb.array([]);
-      this.createDealsInCampaignRequestArray.forEach(detail => {
-        this.childArray.push(this.createChildArray(detail));
-      });
-      // Add the finished array onto the top-level form.
-      this.parentForm.setControl('childArray', this.childArray);
-      console.log('XXXXXX this.childArray ', this.childArray);
-      // this.dataSource = new MatTableDataSource((this.childArray as FormArray).controls);
+      this.loadform();
+
+      this.dataSource = new MatTableDataSource((this.form.get('deals') as FormArray).controls);
       console.log('XXXXXX this.dataSource.data ', this.dataSource.data);
 
-      this.setDownload(jsonObject);
+      this.setDownload(JSON.stringify(xLRowObject));
     };
 
     reader.readAsBinaryString(target.files[0]);
 
     // document.getElementById('output').innerHTML = dataString.slice(0, 300).concat('...');
   }
-
 
   header_diff(a1: any[], a2: any[]): any {
     const intersectionA = a1.filter(x => a2.includes(x));
