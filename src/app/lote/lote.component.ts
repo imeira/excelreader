@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import {FormArray, FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgxCSVParserError } from 'ngx-csv-parser';
@@ -9,12 +9,12 @@ import { AcordoEnum } from '../enum/AcordoEnum';
 import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequest';
 import {LoteService} from '../services/lote.service';
 import { ToastrService } from 'ngx-toastr';
-import {Observable} from "rxjs";
+import {Observable} from 'rxjs';
 
 const SCHEMA = {
   PoupadorNome: 'text',
   PoupadorCPF: 'text',
-  PoupadorDtNascimento: 'date',
+  PoupadorDtNascimento: 'text',
   PoupadorEndereco: 'text',
   PoupadorEnderecoNumero: 'text',
   PoupadorEnderecoComplemento: 'text',
@@ -25,7 +25,6 @@ const SCHEMA = {
 
 
 type AOA = any[][];
-// const ELEMENT_DATA: CreateDealsInCampaignRequest[] = [];
 
 @Component({
   selector: 'app-lote',
@@ -37,18 +36,16 @@ export class LoteComponent implements OnInit {
   constructor(
     private loteService: LoteService,
     private toastr: ToastrService,
-    private formBuilder: FormBuilder
+    private fb: FormBuilder
   ) { }
 
   titulo: string;
-  formulario: FormGroup;
-
 
   dataSchema = SCHEMA;
   dataHeader!: AOA;
   dataBody!: AOA;
   displayedColumns: string[];
-  // dataSource = new MatTableDataSource(ELEMENT_DATA);
+  // dataSource = new MatTableDataSource < any > ();
   dataSource = new MatTableDataSource < CreateDealsInCampaignRequest > ();
 
   createDealsInCampaignRequest: CreateDealsInCampaignRequest;
@@ -61,6 +58,10 @@ export class LoteComponent implements OnInit {
 
   file!: File;
 
+  parentForm: FormGroup;
+  childArray: FormArray;
+  invalid = false;
+
   // tslint:disable-next-line:use-lifecycle-interface
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
@@ -70,19 +71,89 @@ export class LoteComponent implements OnInit {
     this.validation();
   }
 
-  validation() {
-    this.formulario = this.formBuilder.group({
-      busca: [null, Validators.required]
-      // tema: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
-      // local: ['', Validators.required],
-      // qtdPessoas: ['', [Validators.required, Validators.max(120000)]],
-      // telefone: ['', Validators.required],
-      // email: ['', [Validators.required, Validators.email]]
-    });
+  // get childArray(): FormArray {
+  //   return this.parentForm.get('childArray') as FormArray;
+  // }
 
+  validation() {
+
+    this.parentForm = this.fb.group({
+      busca: [null, Validators.required],
+      // createDealsInCampaignRequest: this.fb.group({
+      //   PoupadorNome: [null, Validators.required],
+      //   PoupadorCPF: [null, Validators.required],
+      //   PoupadorDtNascimento: [null, Validators.required],
+      //   PoupadorEndereco: [null, Validators.required],
+      //   PoupadorEnderecoNumero: [null, Validators.required],
+      //   PoupadorEnderecoComplemento: [null, Validators.required],
+      //   PoupadorEnderecoMunicipio: [null, Validators.required],
+      //   PoupadorEnderecoBairro: [null, Validators.required],
+      //   PoupadorEnderecoUF: [null, Validators.required]
+      // }),
+      childArray: this.fb.array([])
+    });
   }
 
-   applyFilter(filterValue: string) {
+  showValidation(fromgroup: FormGroup){
+    Object.keys(fromgroup.controls).forEach(campo => {
+      const controle = fromgroup.get(campo);
+      if (controle.invalid) {
+        this.invalid = true;
+        controle.markAsDirty();
+
+      }
+      if (controle instanceof FormGroup){
+        this.showValidation(controle);
+      }
+    });
+  }
+  createChildArray(createDealsInCampaignRequest: CreateDealsInCampaignRequest): FormGroup {
+    return this.fb.group({
+      PoupadorNome: new FormControl(createDealsInCampaignRequest.PoupadorNome,    [Validators.required]),
+      PoupadorCPF: new FormControl(createDealsInCampaignRequest.PoupadorCPF,    [Validators.required]),
+      PoupadorDtNascimento: new FormControl(createDealsInCampaignRequest.PoupadorDtNascimento,    [Validators.required]),
+      PoupadorEndereco: new FormControl(createDealsInCampaignRequest.PoupadorEndereco,    [Validators.required]),
+      PoupadorEnderecoNumero: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoNumero,    [Validators.required]),
+      PoupadorEnderecoComplemento: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoComplemento,    [Validators.required]),
+      PoupadorEnderecoMunicipio: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoMunicipio,    [Validators.required]),
+      PoupadorEnderecoBairro: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoBairro,    [Validators.required]),
+      PoupadorEnderecoUF: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoUF,    [Validators.required])
+      // CEP:  [null, [Validators.required, FormValidations.cepvalidator]]
+    });
+  }
+
+
+  createChildArrayNew(): FormGroup {
+    return this.fb.group({
+      PoupadorNome: [null, Validators.required],
+      PoupadorCPF: [null, Validators.required],
+      PoupadorDtNascimento: [null, Validators.required],
+      PoupadorEndereco: [null, Validators.required],
+      PoupadorEnderecoNumero: [null, Validators.required],
+      PoupadorEnderecoComplemento: [null, Validators.required],
+      PoupadorEnderecoMunicipio: [null, Validators.required],
+      PoupadorEnderecoBairro: [null, Validators.required],
+      PoupadorEnderecoUF: [null, Validators.required]
+    });
+  }
+
+  aplicaCssErro(input: string) {
+    const control = this.parentForm.get(input);
+    if (control !== null) {
+    return {
+      'is-invalid' : control.invalid && (control.touched || control.dirty)
+    };
+    } else {
+      return '';
+    }
+  }
+
+  defaultErrorStateMatcher(control, form): any {
+    const /** @type {?} */ isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.touched || isSubmitted));
+  }
+
+  applyFilter(filterValue: string) {
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     this.dataSource.filter = filterValue;
@@ -176,9 +247,9 @@ export class LoteComponent implements OnInit {
       .validateCreateDealsInCampaignRequest(model);
   }
 
-  register() {
+  onSubmit() {
     console.log('XXXXXX register this.dataSource1.data', this.dataSource.data);
-    if (this.formulario.valid) {
+    if (this.parentForm.valid) {
       this.setCreateDealsInCampaignRequestArrayByDataSource();
       this.loteService
         .postCreateDealsInCampaignRequest(this.createDealsInCampaignRequestArray).subscribe({
@@ -191,6 +262,10 @@ export class LoteComponent implements OnInit {
           console.error('There was an error!', error);
         }
       });
+    } else {
+      console.log('invalido');
+      this.invalid = true;
+      this.showValidation(this.parentForm);
     }
   }
 
@@ -209,7 +284,6 @@ export class LoteComponent implements OnInit {
     this.titulo = this.file.name;
     let workbookkk;
     let xLRowObject;
-    // let parsedJSON = [];
     let jsonObject;
     reader.onload = () => {
       const data = reader.result;
@@ -263,9 +337,16 @@ export class LoteComponent implements OnInit {
       console.log('XXXXXX convertExcelToJson jsonObject', jsonObject);
       console.log(xLRowObject);
       console.log('XXXXXX convertExcelToJson xLRowObject', xLRowObject);
-      // parsedJSON = JSON.parse(jsonObject);
       this.dataSource.data = xLRowObject;
-      // this.dataSource.data[0] = this.displayedColumns;
+      this.setCreateDealsInCampaignRequestArrayByDataSource();
+      this.childArray = this.fb.array([]);
+      this.createDealsInCampaignRequestArray.forEach(detail => {
+        this.childArray.push(this.createChildArray(detail));
+      });
+      // Add the finished array onto the top-level form.
+      this.parentForm.setControl('childArray', this.childArray);
+      console.log('XXXXXX this.childArray ', this.childArray);
+      // this.dataSource = new MatTableDataSource((this.childArray as FormArray).controls);
       console.log('XXXXXX this.dataSource.data ', this.dataSource.data);
 
       this.setDownload(jsonObject);

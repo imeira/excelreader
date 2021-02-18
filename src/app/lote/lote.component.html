@@ -1,5 +1,5 @@
 <script lang="javascript" src="dist/xlsx.full.min.js"></script>
-<form [formGroup]="formulario" (ngSubmit)="formulario.valid" novalidate>
+<ng-form [formGroup]="parentForm" (ngSubmit)="parentForm.valid" novalidate>
 <div class="component-container">
   <div class="inicio-container">
     <h2>Cadastro de Acordo em Lote</h2>
@@ -15,7 +15,6 @@
 
 <br><br>
 
-<ng-form id="formulario" name="formulario">
 <!-- Sucess table -->
 <div class="card" *ngIf="dataSource.data && dataSource.data.length > 0">
   <h3 class="card-header text-center font-weight-bold text-uppercase py-4">{{titulo}}</h3>
@@ -28,9 +27,10 @@
      </span>
      <span class="table-add float-right mb-3 mr-2">
        <a class="text-success">
-         <button type="submit" class="btn btn-success" [disabled]="!formulario.valid" (click)="register()" >
+         <button type="submit" class="btn btn-success" [disabled]="!parentForm.valid" (click)="onSubmit()" >
             <i class="fa -fast-forward">Processar Planilha</i>
          </button>
+         <div *ngIf="!parentForm.valid" style="color:red;">*A tabela contem campos invalidos ou sem preenchimento. </div>
        </a>
      </span>
       <table #tableSuccess id="tableSuccess" class="voxel-table mat-elevation-z8 table" mat-table matSort [dataSource]="dataSource">
@@ -43,7 +43,8 @@
               Ações
             </span>
           </th>
-          <td mat-cell *matCellDef="let element; let i = index;">
+          <div formArrayName="childArray" *ngFor="let child of childArray.controls; let ix=index">
+          <td mat-cell *matCellDef="let element; let i = index;" [formGroupName]="ix">
             <div *ngIf="!element.isEdit">
               <div class="btn-edit" *ngIf="col === '$$edit'; spanHeader" >
                 <button id="editButton{{i}}" (click)="element.isEdit = !element.isEdit">Editar</button>
@@ -52,7 +53,8 @@
                 </span>
               </div>
               <span #spanHeader>
-                {{element[col]}}
+<!--                {{element[col]}}-->
+                <input matInput *ngIf="dataSchema[col]" formControlName="{{col}}" id="{{getPropertyView(col)}}{{i}}View" readonly value="{{element[col]}}" type="{{dataSchema[col]}}">
               </span>
             </div>
             <div *ngIf="element.isEdit">
@@ -70,11 +72,12 @@
               <ng-template #defaultField>
                 <mat-form-field>
                   <mat-label>{{getPropertyView(col)}}</mat-label>
-                   <input matInput  id="{{getPropertyView(col)}}{{i}}" (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" value="{{element[col]}}" type="{{dataSchema[col]}}">
+                   <input matInput formControlName="{{col}}" id="{{getPropertyView(col)}}{{i}}" (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" value="{{element[col]}}" type="{{dataSchema[col]}}">
                 </mat-form-field>
               </ng-template>
             </div>
           </td>
+          </div>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index"></tr>
@@ -82,9 +85,6 @@
     </div>
   </div>
 </div>
-<!-- Sucess table -->
-</ng-form>
-
-  </div>
 </div>
-</form>
+</div>
+</ng-form>

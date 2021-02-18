@@ -17,6 +17,7 @@ import { AppComponent } from './app.component';
 import { ExcelsheetComponent } from './excelsheet/excelsheet.component';
 import { LoteComponent } from './lote/lote.component';
 import {LoteService} from './services/lote.service';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import {LoteService} from './services/lote.service';
     MatTableModule,
     MatInputModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    CommonModule
   ],
   providers: [
     LoteService
