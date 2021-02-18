@@ -31,6 +31,5 @@ export class FormValidations {
       return null;
     };
   }
-
-
+  
 }
