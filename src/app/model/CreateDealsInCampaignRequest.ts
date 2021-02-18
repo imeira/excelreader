@@ -1,4 +1,4 @@
-import {Proxy} from './Proxy';
+import { Proxy } from './Proxy';
 
 export class CreateDealsInCampaignRequest extends Proxy {
 
