@@ -1,90 +1,72 @@
 <script lang="javascript" src="dist/xlsx.full.min.js"></script>
-<ng-form [formGroup]="parentForm" (ngSubmit)="parentForm.valid" novalidate>
-<div class="component-container">
-  <div class="inicio-container">
-    <h2>Cadastro de Acordo em Lote</h2>
-    <p>Escolha o arquivo em formato CSV pré-definido. Após carregar, valide os campos e seus respectivos valores e clique no botão "Cadastrar."
-      <br>
-    </p>
-    <h5><a id="download"> <u>Clique aqui</u> para baixar o Modelo da planilha. </a></h5>
+<ng-form [formGroup]="form" (ngSubmit)="form.valid" novalidate>
+  <div class="component-container">
+    <div class="inicio-container">
+     <div style="align-content: center">
+        <h2>Cadastro de Acordo em Lote</h2>
+        <p>Escolha o arquivo em formato CSV pré-definido. Após carregar, valide os campos e seus respectivos valores e clique no botão "Cadastrar."
+          <br>
+        </p>
+        <h5><a id="download"> <u>Clique aqui</u> para baixar o Modelo da planilha. </a></h5>
 
-     <input formControlName="busca" id="busca" name="busca" type="file" (change)="onFileChange($event)" accept=".csv,.xls,.xlsx" multiple="false" />
+        <input id="busca" name="busca" type="file" (change)="onFileChange($event)" accept=".csv,.xls,.xlsx" multiple="false" />
 
-    <div id="output"></div>
-    <br>
+        <div id="output"></div>
+        <br>
+     </div>
+      <br><br>
 
-<br><br>
-
-<!-- Sucess table -->
-<div class="card" *ngIf="dataSource.data && dataSource.data.length > 0">
-  <h3 class="card-header text-center font-weight-bold text-uppercase py-4">{{titulo}}</h3>
- <div class="card-body">
-   <div id="table" class="table-editable">
-     <span class="table-add float-left mb-3 mr-2">
-       <a class="text-success" (click)="add()" label="Adiconar linha" alt="Adiconar linha">
-         <mdb-icon fas icon="plus" size="2x"></mdb-icon>
-       </a>
-     </span>
-     <span class="table-add float-right mb-3 mr-2">
-       <a class="text-success">
-         <button type="submit" class="btn btn-success" [disabled]="!parentForm.valid" (click)="onSubmit()" >
-            <i class="fa -fast-forward">Processar Planilha</i>
-         </button>
-         <div *ngIf="!parentForm.valid" style="color:red;">*A tabela contem campos invalidos ou sem preenchimento. </div>
-       </a>
-     </span>
-      <table #tableSuccess id="tableSuccess" class="voxel-table mat-elevation-z8 table" mat-table matSort [dataSource]="dataSource">
-        <ng-container matColumnDef="{{col}}" *ngFor="let col of displayedColumns">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            <span *ngIf="col !== '$$edit'">
-              {{getPropertyView(col)}}
-            </span>
-            <span *ngIf="col == '$$edit'">
-              Ações
-            </span>
-          </th>
-          <div formArrayName="childArray" *ngFor="let child of childArray.controls; let ix=index">
-          <td mat-cell *matCellDef="let element; let i = index;" [formGroupName]="ix">
-            <div *ngIf="!element.isEdit">
-              <div class="btn-edit" *ngIf="col === '$$edit'; spanHeader" >
-                <button id="editButton{{i}}" (click)="element.isEdit = !element.isEdit">Editar</button>
-                <span class="btn-remove">
-                  <button (click)="remove(i)" color="danger">Remover</button>
-                </span>
-              </div>
-              <span #spanHeader>
-<!--                {{element[col]}}-->
-                <input matInput *ngIf="dataSchema[col]" formControlName="{{col}}" id="{{getPropertyView(col)}}{{i}}View" readonly value="{{element[col]}}" type="{{dataSchema[col]}}">
-              </span>
-            </div>
-            <div *ngIf="element.isEdit">
-              <div class="btn-edit" *ngIf="col === '$$edit'; else dateField">
-                <button (click)="confirmEdit($event); element.isEdit = !element.isEdit">Confirmar</button>
-              </div>
-              <ng-template #dateField>
-                <mat-form-field appearance="fill" #elseDate *ngIf="dataSchema[col] === 'date'; else defaultField">
-                  <mat-label>{{getPropertyView(col)}}</mat-label>
-                  <input matInput [matDatepicker]="picker" value="{{element[col]}}" (blur)="changeValue(i, col, $event); updateList(i, col, $event)" value="{{element[col]}}">
-                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-datepicker #picker></mat-datepicker>
-                </mat-form-field>
-              </ng-template>
-              <ng-template #defaultField>
-                <mat-form-field>
-                  <mat-label>{{getPropertyView(col)}}</mat-label>
-                   <input matInput formControlName="{{col}}" id="{{getPropertyView(col)}}{{i}}" (blur)="updateList(i, col, $event)" (keyup)="changeValue(i, col, $event)" value="{{element[col]}}" type="{{dataSchema[col]}}">
-                </mat-form-field>
-              </ng-template>
-            </div>
-          </td>
+      <!-- Sucess table -->
+      <div class="card" *ngIf="dataSource && dataSource.data && dataSource.data.length > 0">
+        <h3 class="card-header text-center font-weight-bold text-uppercase py-4">{{titulo}}</h3>
+        <div class="card-body">
+          <div id="table" class="table-editable">
+             <span class="table-add float-left mb-3 mr-2">
+               <a class="text-success" (click)="add()" label="Adiconar linha" alt="Adiconar linha">
+                 <mdb-icon fas icon="plus" size="2x"></mdb-icon>
+               </a>
+             </span>
+            <span class="table-add float-right mb-3 mr-2">
+               <a class="text-success">
+                 <button type="submit" class="btn btn-success" [disabled]="!form.valid" (click)="onSubmit()" >
+                    <i class="fa -fast-forward">Processar Planilha</i>
+                 </button>
+                 <div *ngIf="!form.valid" style="color:red;">*A tabela contem campos invalidos ou sem preenchimento. </div>
+               </a>
+             </span>
+            <table mat-table id="tableSuccess" class="voxel-table mat-elevation-z8 table" matSort [dataSource]="dataSource">
+              <ng-container matColumnDef="{{col}}" *ngFor="let col of displayedColumns">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                  <span *ngIf="col !== '$$edit'">
+                    {{getPropertyView(col)}}
+                  </span>
+                  <span *ngIf="col == '$$edit'">
+                    Ações
+                  </span>
+                </th>
+                <td mat-cell *matCellDef="let element; let i = index;" [formGroup]="element">
+                    <div *ngIf="col === '$$edit'" class="btn-edit" spanHeader >
+                        <span class="btn-remove">
+                          <button (click)="remove(i)" color="danger">Remover</button>
+                        </span>
+                    </div>
+                    <div *ngIf="col != '$$edit'">
+                        <mat-form-field>
+                          <mat-label>{{getPropertyView(col)}}</mat-label>
+                            <input matInput placeholder='{{col}}' [readonly]="dataSource[i].readonly" formControlName='{{col}}' type="{{dataSchema[col]}}" id="{{col}}{{i}}" value="{{element[col]}}">
+                          <mat-error *ngIf="checkError(col,'required', element )">
+                              {{getPropertyView(col)}} is <strong>required</strong>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                  </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index"></tr>
+            </table>
           </div>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index"></tr>
-      </table>
+        </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
-</div>
 </ng-form>
