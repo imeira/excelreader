@@ -1,8 +1,9 @@
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
-import {observable, Observable, throwError} from 'rxjs';
-import {CreateDealsInCampaignRequest} from '../model/CreateDealsInCampaignRequest';
-import { catchError, retry } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequest';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -15,7 +16,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class LoteService {
-  baseURL = 'http://localhost:5000/api/lote';
+  baseURL = 'http://localhost:52188/api/v1/campaign/{idCampaign}/deals';
 
   constructor(private http: HttpClient) {
     // TODO definir
@@ -43,15 +44,12 @@ export class LoteService {
       );
   }
 
-  postCreateDealsInCampaignRequest(array: CreateDealsInCampaignRequest[]): Observable<CreateDealsInCampaignRequest> | null {
-    array.forEach(createDealsInCampaignRequest => {
-      console.log('XXXXXX LoteService.postCreateDealsInCampaignRequest createDealsInCampaignRequest', createDealsInCampaignRequest);
-      return this.http.post<CreateDealsInCampaignRequest>(this.baseURL, createDealsInCampaignRequest, httpOptions)
-        .pipe(
-          catchError(this.handleError)
-        );
-    });
-    return null;
+  postCreateDealsInCampaignRequest(array: CreateDealsInCampaignRequest[]): Observable<CreateDealsInCampaignRequest> {
+    console.log('XXXXXX LoteService.postCreateDealsInCampaignRequest createDealsInCampaignRequest', array);
+    return this.http.post<CreateDealsInCampaignRequest>(this.baseURL, array, httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   putCreateDealsInCampaignRequest(createDealsInCampaignRequest: CreateDealsInCampaignRequest) {
@@ -80,6 +78,37 @@ export class LoteService {
     }
     return throwError(
       'Something bad happened; please try again later.');
+  }
+
+  getSchema(): any {
+    return [
+      {
+        'nameexcel': 'coluna1',
+        'nametable': 'Coluna 1',
+        'isreadOnly': 'true'
+
+      },
+      {
+        'nameexcel': 'coluna2',
+        'nametable': 'Coluna 2',
+        'isreadOnly': 'false'
+      },
+      {
+        'nameexcel': 'coluna3',
+        'nametable': 'Coluna 3',
+        'isreadOnly': 'false'
+      },
+      {
+        'nameexcel': 'coluna4',
+        'nametable': 'Coluna 4',
+        'isreadOnly': 'false'
+      },
+      {
+        'nameexcel': 'coluna5',
+        'nametable': 'Coluna 5',
+        'isreadOnly': 'false'
+      }
+    ];
   }
 
 }
