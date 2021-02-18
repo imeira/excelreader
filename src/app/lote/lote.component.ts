@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgxCSVParserError } from 'ngx-csv-parser';
@@ -7,9 +7,9 @@ import * as XLSX from 'xlsx';
 import { read, utils } from 'xlsx';
 import { AcordoEnum } from '../enum/AcordoEnum';
 import { CreateDealsInCampaignRequest } from '../model/CreateDealsInCampaignRequest';
-import {LoteService} from '../services/lote.service';
+import { LoteService } from '../services/lote.service';
 import { ToastrService } from 'ngx-toastr';
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 
 const SCHEMA = {
   PoupadorNome: 'text',
@@ -45,10 +45,7 @@ export class LoteComponent implements OnInit {
   dataHeader!: AOA;
   dataBody!: AOA;
   displayedColumns: string[];
-  // dataSource = new MatTableDataSource < any > ();
-  dataSource = new MatTableDataSource < CreateDealsInCampaignRequest > ();
-
-  createDealsInCampaignRequest: CreateDealsInCampaignRequest;
+  dataSource = new MatTableDataSource <CreateDealsInCampaignRequest>();
   createDealsInCampaignRequestArray: CreateDealsInCampaignRequest[] = [];
 
   @ViewChild(MatSort) sort: MatSort;
@@ -62,18 +59,9 @@ export class LoteComponent implements OnInit {
   childArray: FormArray;
   invalid = false;
 
-  // tslint:disable-next-line:use-lifecycle-interface
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
-  }
-
   ngOnInit() {
     this.validation();
   }
-
-  // get childArray(): FormArray {
-  //   return this.parentForm.get('childArray') as FormArray;
-  // }
 
   validation() {
 
@@ -94,30 +82,30 @@ export class LoteComponent implements OnInit {
     });
   }
 
-  showValidation(fromgroup: FormGroup){
+  showValidation(fromgroup: FormGroup) {
     Object.keys(fromgroup.controls).forEach(campo => {
       const controle = fromgroup.get(campo);
-      if (controle.invalid) {
+      if (controle != null && controle.invalid) {
         this.invalid = true;
         controle.markAsDirty();
 
       }
-      if (controle instanceof FormGroup){
+      if (controle instanceof FormGroup) {
         this.showValidation(controle);
       }
     });
   }
   createChildArray(createDealsInCampaignRequest: CreateDealsInCampaignRequest): FormGroup {
     return this.fb.group({
-      PoupadorNome: new FormControl(createDealsInCampaignRequest.PoupadorNome,    [Validators.required]),
-      PoupadorCPF: new FormControl(createDealsInCampaignRequest.PoupadorCPF,    [Validators.required]),
-      PoupadorDtNascimento: new FormControl(createDealsInCampaignRequest.PoupadorDtNascimento,    [Validators.required]),
-      PoupadorEndereco: new FormControl(createDealsInCampaignRequest.PoupadorEndereco,    [Validators.required]),
-      PoupadorEnderecoNumero: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoNumero,    [Validators.required]),
-      PoupadorEnderecoComplemento: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoComplemento,    [Validators.required]),
-      PoupadorEnderecoMunicipio: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoMunicipio,    [Validators.required]),
-      PoupadorEnderecoBairro: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoBairro,    [Validators.required]),
-      PoupadorEnderecoUF: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoUF,    [Validators.required])
+      PoupadorNome: new FormControl(createDealsInCampaignRequest.PoupadorNome, [Validators.required]),
+      PoupadorCPF: new FormControl(createDealsInCampaignRequest.PoupadorCPF, [Validators.required]),
+      PoupadorDtNascimento: new FormControl(createDealsInCampaignRequest.PoupadorDtNascimento, [Validators.required]),
+      PoupadorEndereco: new FormControl(createDealsInCampaignRequest.PoupadorEndereco, [Validators.required]),
+      PoupadorEnderecoNumero: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoNumero, [Validators.required]),
+      PoupadorEnderecoComplemento: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoComplemento, [Validators.required]),
+      PoupadorEnderecoMunicipio: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoMunicipio, [Validators.required]),
+      PoupadorEnderecoBairro: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoBairro, [Validators.required]),
+      PoupadorEnderecoUF: new FormControl(createDealsInCampaignRequest.PoupadorEnderecoUF, [Validators.required])
       // CEP:  [null, [Validators.required, FormValidations.cepvalidator]]
     });
   }
@@ -139,24 +127,12 @@ export class LoteComponent implements OnInit {
 
   aplicaCssErro(input: string) {
     const control = this.parentForm.get(input);
-    if (control !== null) {
-    return {
-      'is-invalid' : control.invalid && (control.touched || control.dirty)
-    };
-    } else {
-      return '';
+    // tslint:disable-next-line:early-exit
+    if (control != null) {
+      return {
+        'is-invalid' : control.invalid && (control.touched || control.dirty)
+      };
     }
-  }
-
-  defaultErrorStateMatcher(control, form): any {
-    const /** @type {?} */ isSubmitted = form && form.submitted;
-    return !!(control && control.invalid && (control.touched || isSubmitted));
-  }
-
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
   }
 
   confirmEdit(event: any) {
@@ -210,6 +186,7 @@ export class LoteComponent implements OnInit {
     console.log('XXXXXX add this.dataSource', this.dataSource);
     setTimeout(() => {
       const el = document.getElementById('editButton' + (this.dataSource.data.length - 1));
+      // tslint:disable-next-line:early-exit
       if (el != null) {
         el.click();
         setTimeout(() => {
@@ -253,15 +230,14 @@ export class LoteComponent implements OnInit {
       this.setCreateDealsInCampaignRequestArrayByDataSource();
       this.loteService
         .postCreateDealsInCampaignRequest(this.createDealsInCampaignRequestArray).subscribe({
-        next: data => {
-          console.log('XXXXXX register data.id', data.id);
-          this.toastr.success('Arquivo registrado com Sucesso!');
-        },
-        error: error => {
-          this.toastr.error(error.message);
-          console.error('There was an error!', error);
-        }
-      });
+          next: data => {
+            console.log('XXXXXX register data.id', data.id);
+            this.toastr.success('Arquivo registrado com Sucesso!');
+          },
+          error: error => {
+            this.toastr.error(error.message);
+            console.error('There was an error!', error);
+          }});
     } else {
       console.log('invalido');
       this.invalid = true;
@@ -337,6 +313,7 @@ export class LoteComponent implements OnInit {
       console.log('XXXXXX convertExcelToJson jsonObject', jsonObject);
       console.log(xLRowObject);
       console.log('XXXXXX convertExcelToJson xLRowObject', xLRowObject);
+      // @ts-ignore
       this.dataSource.data = xLRowObject;
       this.setCreateDealsInCampaignRequestArrayByDataSource();
       this.childArray = this.fb.array([]);
