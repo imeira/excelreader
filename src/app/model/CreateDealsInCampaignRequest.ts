@@ -65,16 +65,16 @@ export class CreateDealsInCampaignRequest extends Proxy {
   }
 
   get PoupadorNomeView(): string {
-    return 'Poupador';
+    return 'Razão Social';
   }
   get PoupadorCPFView(): string {
-    return 'CPF';
+    return 'C P F';
   }
   get PoupadorDtNascimentoView(): string {
-    return 'Data Nascimento';
+    return 'Data Nasci mento';
   }
   get PoupadorEnderecoView(): string {
-    return 'Endereço';
+    return 'Ender eço';
   }
   get PoupadorEnderecoCEPView(): string {
     return 'CEP';
