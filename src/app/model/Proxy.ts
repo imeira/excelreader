@@ -1,6 +1,6 @@
-
 export class Proxy {
   constructor(kwArgs: {}) {
+    // tslint:disable-next-line:forin
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
     }
@@ -10,9 +10,9 @@ export class Proxy {
     return this[key];
   }
 
-  set(key: {}): void;
-  set(key: string, value: any): void;
-  set(key: any, value?: any): void {
-    // ...
-  }
+  // set(key: {}): void;
+  // set(key: string, value: any): void;
+  // set(key: any, value?: any): void {
+  //   // ...
+  // }
 }
