@@ -8,10 +8,41 @@ export class CreateDealsInCampaignRequest extends Proxy {
 
   id: number;
 
-  TipoPessoa: number;
-
   PoupadorNome: string;
   PoupadorCPF: string;
+  NumeroProcessoCNJ: string;
+  CodigoBJ: string;
+  UFProcesso: string;
+  PossuiAdvogado: boolean;
+  AdvogadoNome: string;
+  AdvogadoCPF: string;
+  AdvogadoOABMatricula: string;
+  AdvogadoOABMatriculaUF: string;
+  AdvogadoPJCNPJ: string;
+  AdvogadoPJRazaoSocial: string;
+  AdvogadoPJOptanteSimples: string;
+  ValorAcordoPoupador: number;
+  ValorHonorarios: number;
+  ValorFebrapo: number;
+  ValorCustasProcessuais: number;
+  FormaPagamentoAcordo: string;
+  FormaPagamentoHonorario: string;
+  QtdaParcelasAcordo: number;
+  ValorParcelasAcordo: number;
+  DestinatarioPagamentoAcordo: string;
+  DestinatarioPagamentoHonorario: string;
+  NumeroBancoPoupador: number;
+  NomeBancoPoupador: string;
+  NumeroAgenciaPoupador: string;
+  NumeroContaPoupador: string;
+  DvContaPoupador: string;
+  NomeBancoAdvogado: string;
+  NumeroBancoAdvogado: number;
+  NumeroAgenciaAdvogado: string;
+  NumeroContaAdvogado: string;
+  DvContaAdvogado: string;
+
+  TipoPessoa: number;
   PoupadorDtNascimento: Date;
   PoupadorEndereco: string;
   PoupadorEnderecoNumero: string;
@@ -19,44 +50,12 @@ export class CreateDealsInCampaignRequest extends Proxy {
   PoupadorEnderecoMunicipio: string;
   PoupadorEnderecoBairro: string;
   PoupadorEnderecoUF: string;
-
   PoupadorEnderecoCEP: string;
-  NumeroProcessoCNJ: string;
-  CodigoBJ: string;
   DtAjuizamento: Date;
   OrgaoLegal: string;
   Vara: string;
   Comarca: string;
-  UFProcesso: string;
   TipoAcao: string;
-  PossuiAdvogado: boolean;
-  AdvogadoNome: string;
-  AdvogadoCPF: string;
-  AdvogadoOABMatricula: string;
-  AdvogadoOABMatriculaUF: string;
-  AdvogadoPJRazaoSocial: string;
-  AdvogadoPJCNPJ: string;
-  AdvogadoPJOptanteSimples: string;
-  ValorAcordoPoupador: number;
-  ValorHonorarios: number;
-  ValorFebrapo: number;
-  ValorCustasProcessuais: number;
-  QtdaParcelasAcordo: number;
-  ValorParcelasAcordo: number;
-  FormaPagamentoAcordo: string;
-  DestinatarioPagamentoAcordo: string;
-  NumeroBancoPoupador: number;
-  NomeBancoPoupador: string;
-  NumeroAgenciaPoupador: string;
-  NumeroContaPoupador: string;
-  DvContaPoupador: string;
-  FormaPagamentoHonorario: string;
-  DestinatarioPagamentoHonorario: string;
-  NumeroBancoAdvogado: number;
-  NomeBancoAdvogado: string;
-  NumeroAgenciaAdvogado: string;
-  NumeroContaAdvogado: string;
-  DvContaAdvogado: string;
   CampanhaTipoId: number;
 
   get(key: string): any {
@@ -68,30 +67,99 @@ export class CreateDealsInCampaignRequest extends Proxy {
     return 'Razão Social';
   }
   get PoupadorCPFView(): string {
-    return 'C P F';
+    return 'CPF';
   }
-  get PoupadorDtNascimentoView(): string {
-    return 'Data Nasci mento';
+  get NumeroProcessoCNJView(): string {
+    return 'Numero Processo CNJ';
   }
-  get PoupadorEnderecoView(): string {
-    return 'Ender eço';
+  get CodigoBJView(): string {
+    return 'Codigo BJ';
   }
-  get PoupadorEnderecoCEPView(): string {
-    return 'CEP';
+  get UFProcessoView(): string {
+    return 'UF Processo';
   }
-  get PoupadorEnderecoNumeroView(): string {
-    return 'Numero';
+  get PossuiAdvogadoView(): string {
+    return 'Possui Advogado';
   }
-  get PoupadorEnderecoComplementoView(): string {
-    return 'Complemento';
+  get AdvogadoNomeView(): string {
+    return 'Advogado Nome';
   }
-  get PoupadorEnderecoMunicipioView(): string {
-    return 'Municipio';
+  get AdvogadoCPFView(): string {
+    return 'Advogado CPF';
   }
-  get PoupadorEnderecoBairroView(): string {
-    return 'Bairro';
+  get AdvogadoOABMatriculaView(): string {
+    return 'Advogado OAB';
   }
-  get PoupadorEnderecoUFView(): string {
-    return 'UF';
+  get AdvogadoOABMatriculaUFView(): string {
+    return 'Advogado OAB UF';
+  }
+  get AdvogadoPJCNPJView(): string {
+    return 'Advogado NPJ';
+  }
+  get AdvogadoPJRazaoSocialView(): string {
+    return 'Advogado RazaoSocial';
+  }
+  get AdvogadoPJOptanteSimplesView(): string {
+    return 'OptanteSimples';
+  }
+  get ValorAcordoPoupadorView(): string {
+    return 'Valor Acordo';
+  }
+  get ValorHonorariosView(): string {
+    return 'Valor Honorarios';
+  }
+  get ValorFebrapoView(): string {
+    return 'Valor Febrapo';
+  }
+  get ValorCustasProcessuaisView(): string {
+    return 'Valor Custas Processuais';
+  }
+  get FormaPagamentoAcordoView(): string {
+    return 'Forma Pagamento Acordo';
+  }
+  get FormaPagamentoHonorarioView(): string {
+    return 'Forma Pagamento Honorario';
+  }
+  get QtdaParcelasAcordoView(): string {
+    return 'QtdaParcelas Acordo';
+  }
+  get ValorParcelasAcordoView(): string {
+    return 'Valor Parcela Acordo';
+  }
+  get DestinatarioPagamentoAcordoView(): string {
+    return 'Destinatario Pagamento Acordo';
+  }
+  get DestinatarioPagamentoHonorarioView(): string {
+    return 'Destinatario Pagamento Honorario';
+  }
+  get NumeroBancoPoupadorView(): string {
+    return 'Numero Banco Poupador';
+  }
+  get NomeBancoPoupadorView(): string {
+    return 'Nome Banco Poupador';
+  }
+  get NumeroAgenciaPoupadorView(): string {
+    return 'Numero Agencia Poupador';
+  }
+  get NumeroContaPoupadorView(): string {
+    return 'Numero Conta aPoupador';
+  }
+  get DvContaPoupadorView(): string {
+    return 'Dv Cont aPoupador';
+  }
+  get NomeBancoAdvogadoView(): string {
+    return 'Nome Banco Advogado';
+  }
+  get NumeroBancoAdvogadoView(): string {
+    return 'Numero Banco Advogado';
+  }
+  get NumeroAgenciaAdvogadoView(): string {
+    return 'Numero Agenci Advogado';
+  }
+  get NumeroContaAdvogadoView(): string {
+    return 'Numero Conta Advogado';
+  }
+  get DvContaAdvogadoView(): string {
+    return 'Dv Conta Advogado';
   }
 }
