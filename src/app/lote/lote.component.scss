@@ -1,43 +1,42 @@
 .component-container {
   display: flex;
-  justify-content: center;
+  // justify-content: center;
   min-height: calc(100vh - 180px);
   padding-bottom: 60px;
 }
 
-.button-container {
-  // display: flex;
-  justify-content: flex-start;
-
-  button {
-    margin-top: 40px;
-  }
-}
-
-.lote-container {
-  width: 832px;
-
-  &__input {
-    min-height: 108px;
-  }
-
-  &__edit-column {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-  }
-
-  &__vxicon {
-    display: inline-block;
-  }
+.cabecalho-container {
+  justify-content: center !important;
+  // text-align: center;
 }
 
 table {
-  width: 100%;
+  width: 200%;
   background-color:white;
-  border-color: black;
+  // border-collapse:collapse;
+  table-layout:fixed;
+  font-size: calc(3vw + 3vh);
+  text-size-adjust: auto;
+}
+
+td {
+  border: 1px solid #333;
 }
 
 th.mat-sort-header-sorted {
   color: black;
 }
+
+// .mat-footer-row,
+// .mat-header-row,
+// .mat-header-cell,
+// .mat-row {
+//     column-width: 30px !important;
+// }
+
+// .mat-column-UFProcesso {
+//   column-width: 50px !important;
+// }
+// .mat-column-AdvogadoOABMatriculaUF {
+//   column-width: 50px !important;
+// }
