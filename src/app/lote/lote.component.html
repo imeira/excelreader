@@ -2,7 +2,7 @@
 <app-breadcrumb page="lote"></app-breadcrumb>
 <ng-form [formGroup]="form" (ngSubmit)="form.valid" novalidate>
   <div class="component-container">
-    <div class="inicio-container">
+    <div class="container-fluid">
 
      <div class="cabecalho-container">
         <h2>Cadastro de Acordo em Lote</h2>
@@ -19,23 +19,23 @@
 
       <!-- Sucess table -->
       <div class="card" *ngIf="dataSource && dataSource.data && dataSource.data.length > 0">
-        <h3 class="card-header text-left font-weight-bold text-uppercase py-4">{{titulo}}</h3>
+        <h3 class="card-header text-left font-weight-bold text-uppercase py-4">{{titulo}}
+          <span class="float-right mb-3 mr-2">
+            <a class="text-success">
+              <button type="submit" class="btn btn-success" [disabled]="!form.valid" (click)="onSubmit()" >
+                <i class="fa -fast-forward">Processar Planilha</i>
+              </button>
+            </a>
+          </span>
+        </h3>
         <div class="card-body">
-          <div id="table" class="table-editable">
-            <span class="table-add float-left mb-3 mr-2">
-              <a class="text-success">
-                <button type="submit" class="btn btn-success" [disabled]="!form.valid" (click)="onSubmit()" >
-                   <i class="fa -fast-forward">Processar Planilha</i>
-                </button>
-                <div *ngIf="!form.valid" style="color:red;">*A tabela contem campos invalidos ou sem preenchimento. </div>
-              </a>
-            </span>
-             <span class="table-add float-right mb-3 mr-2">
-               <a class="text-success" (click)="add()" label="Adiconar linha" alt="Adiconar linha">
-                 <mdb-icon fas icon="plus" size="2x"></mdb-icon>
-               </a>
-             </span>
-
+           <span class="table-add float-right mb-3 mr-2">
+             <a class="text-success" (click)="add()" label="Adiconar linha" alt="Adiconar linha">
+               <mdb-icon fas icon="plus" size="2x"></mdb-icon>
+             </a>
+           </span>
+           <div *ngIf="!form.valid" class="fs-3 fw-bold" style="color:red;">*A tabela contem campos invalidos ou sem preenchimento. </div>
+          <div id="table" class="table-responsive">
             <table mat-table id="tableSuccess" class="voxel-table mat-elevation-z8 table" matSort [dataSource]="dataSource">
               <ng-container matColumnDef="{{col}}" *ngFor="let col of displayedColumns">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -74,12 +74,3 @@
   </div>
 </ng-form>
 
-<script>
-  $(document).ready(function() {
-    $('#tableSuccess').DataTable( {
-        scrollY:        '50vh',
-        scrollCollapse: true,
-        paging:         false
-    } );
-} );
-</script>
