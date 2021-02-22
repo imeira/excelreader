@@ -14,9 +14,6 @@ table {
   width: 200%;
   background-color:white;
   // border-collapse:collapse;
-  table-layout:fixed;
-  font-size: calc(3vw + 3vh);
-  text-size-adjust: auto;
 }
 
 td {
@@ -26,13 +23,6 @@ td {
 th.mat-sort-header-sorted {
   color: black;
 }
-
-// .mat-footer-row,
-// .mat-header-row,
-// .mat-header-cell,
-// .mat-row {
-//     column-width: 30px !important;
-// }
 
 // .mat-column-UFProcesso {
 //   column-width: 50px !important;
