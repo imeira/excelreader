@@ -119,18 +119,26 @@ export class LoteComponent implements OnInit {
       this.setFormGroup(line);
       console.log('XXX loadform Line', line[0]);
       console.log('XXX loadform FORM', this.form);
+
     });
+
   }
 
   checkError = (controlName: string, errorName: string, element: FormGroup) => {
-    // console.log('controlName:', controlName, ' errorName:', errorName, ' Value:', element.controls[controlName].value);
-    return element.controls[controlName].hasError(errorName);
+    const control = element.controls[controlName];
+    const hasError = control.hasError(errorName);
+    if (hasError) {
+      // console.log('controlName:', controlName, ' errorName:', errorName, ' Value:', control.value);
+      control.markAllAsTouched();
+    }
+    return hasError;
   }
 
   showValidation(fromgroup: FormGroup) {
     Object.keys(fromgroup.controls).forEach(campo => {
       const controle = fromgroup.get(campo);
       if (controle != null && controle.invalid) {
+        console.log('XXX showValidation controle', controle);
         controle.markAsDirty();
       }
       if (controle instanceof FormGroup) {
