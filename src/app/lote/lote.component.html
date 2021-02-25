@@ -35,7 +35,7 @@
              </a>
            </span>
            <div *ngIf="!form.valid" class="fs-3 fw-bold" style="color:red;">*A tabela contem campos invalidos ou sem preenchimento. </div>
-          <div id="table" class="table-responsive  table-hover">
+          <div id="table" class="table-responsive">
             <table mat-table id="tableSuccess" class="voxel-table mat-elevation-z8 table" matSort [dataSource]="dataSource">
               <ng-container matColumnDef="{{col}}" *ngFor="let col of displayedColumns">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -54,7 +54,7 @@
                     </div>
                     <div *ngIf="col != '$$edit'">
                         <mat-form-field>
-<!--                          <mat-label>{{getPropertyView(col)}75}</mat-label>-->
+                          <mat-label>{{getPropertyView(col)}}</mat-label>
                             <input matInput placeholder='{{col}}' formControlName='{{col}}' type="{{dataSchema[col]}}" id="{{col}}{{i}}" value="{{element[col]}}">
                           <mat-error *ngIf="checkError(col,'required', element )">
                               {{getPropertyView(col)}} is <strong>required</strong>
@@ -73,4 +73,3 @@
     </div>
   </div>
 </ng-form>
-
