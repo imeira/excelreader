@@ -119,16 +119,14 @@ export class LoteComponent implements OnInit {
       this.setFormGroup(line);
       console.log('XXX loadform Line', line[0]);
       console.log('XXX loadform FORM', this.form);
-
     });
-
   }
 
   checkError = (controlName: string, errorName: string, element: FormGroup) => {
     const control = element.controls[controlName];
     const hasError = control.hasError(errorName);
     if (hasError) {
-      // console.log('controlName:', controlName, ' errorName:', errorName, ' Value:', control.value);
+      console.log('controlName:', controlName, ' errorName:', errorName, ' Value:', control.value);
       control.markAllAsTouched();
     }
     return hasError;
@@ -138,7 +136,6 @@ export class LoteComponent implements OnInit {
     Object.keys(fromgroup.controls).forEach(campo => {
       const controle = fromgroup.get(campo);
       if (controle != null && controle.invalid) {
-        console.log('XXX showValidation controle', controle);
         controle.markAsDirty();
       }
       if (controle instanceof FormGroup) {
